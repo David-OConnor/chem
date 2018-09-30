@@ -1,5 +1,7 @@
 // Computation Quantum Chemistry: A Primer, by Eric Cances
 
+////// Assumptions
+
 // Bohr-Oppenheimer:
 //-Nuclei are classical point-like particles
 //-The state of the electrons (represented by some electronic wavefunction ψ_e
@@ -8,11 +10,21 @@
 //the energy of the electrons for the nuclear configuration (21 ..... 2M) under
 //consideration.
 
+// Non-relativistic. Heavier elements may need relativity to be accurate.
+
+//////
+
+// Non-ascii idents and lower case globals for scientific constants.
 #![feature(non_ascii_idents)]
+#![allow(non_upper_case_globals)]
 
 use std::ops::{Add, Sub, Mul};
+use std::cell::{Cell, RefCell};  // todo see note below.
+use std::rc::Rc;  // todo For global state; may handle this in main() instead.
 
 // todo improve precision of these values.
+
+const π = std::f64::consts::PI;
 
 // Masses are in kg
 const PROTON_MASS: f64 = 1.6726219e-27;
@@ -21,18 +33,30 @@ const ELECTRON_MASS: f64 = 9.109390e-31;
 
 const ELEMEN_CHARGE: f64 = 1.60217662e-19;  // coulombs
 const h: f64 = 6.2607004e-34; //m^2 * kg /s
-const ħ: f64 = h / (2. * std::f64::consts::PI);
+const ħ: f64 = h / (2. * π);
+
+const α = 0.007297352566206498  // Fine structure constant; dimensionless
 
 const k: f64 = 8987551787.3681764;  // N * m^2 * C^-2
 
-#[derive(Debug)]
+// Atomic unit system.
+const m_e_UAS: f64 = 1.;
+const e_UAS: f64 = 1.;
+const ħ_UAS: f64 = 1.;
+const ε_0_UAS: f64 = 1 / (4. * π)
+// Speed of light in UAS is 1/α
+
+const TIME_SCALE: f64 = 10e-12;  // Rough OOM scale.
+
+
+#[derive(Debug)]  // todo Clone temp.
 struct State {
     temp: f64,  // Kelvin
     nuclei: Vec<Nucleus>,
     electrons: Vec<Electron>,
 }
 
-#[derive(Copy, Clone, Debug)]  // todo copy
+#[derive(Copy, Clone, Debug)]
 struct Vec3 {
     x: f64,
     y: f64,
@@ -40,6 +64,10 @@ struct Vec3 {
 }
 
 impl Vec3 {
+    fn new(x: f64, y: f64, z: f64) -> Vec3 {
+        Vec3 {x, y, z}
+    }
+
     fn add(&self, other: &Vec3) -> Vec3 {
         Vec3 {
             x: self.x + other.x,
@@ -98,7 +126,16 @@ struct Nucleus {
     vel: Vec3,
 }
 
+enum Symmetry {
+    Symmetric,
+    Antisymmetrix,
+}
+
 impl Nucleus {
+    fn new(protons: i8, neutrons: i8, position: Vec3, vel: Vec3) -> Nucleus {
+        Nucleus {protons, neutrons, position, vel}
+    }
+
     fn mass(&self) -> f64 {
         // Assume a point mass
         self.protons as f64 * PROTON_MASS + self.neutrons as f64 * NEUTRON_MASS
@@ -106,15 +143,45 @@ impl Nucleus {
 
     fn charge(&self) -> f64 {
         // Assume a point charge
-        self.protons as f64 * ELEMEN_CHARGE
+        self.protons as f64 * e_UAS
     }
+
+    fn symmetric(&self) -> Symmetry {
+        if (self.protons + self.neutrons) % 2 == 0) {
+            Symmetry::Symmetric
+        }
+        Symmetry::Antisymmetric
+    }
+}
+
+impl Default for Nucleus {
+    fn default() -> Nucleus {
+        Nucleus {
+            protons: 1,
+            neutrons: 1,
+            // For a nucleus composed of K nucleons, the spin variable
+            // can take 1/4 * (K + 2)^2 values if K is even, and 
+            // 1/4 * (K + 1)(K+3) values if K is odd.
+            spin: i8, 
+            position: Vec3::new(0., 0., 0.),
+            vel: Vec3::new(0., 0., 0.),
+        }
+    }
+}
+
+enum Spin {
+    Up,
+    Down,
 }
 
 #[derive(Debug)]
 struct Electron {
-    spin: i8,
+    spin: Spin,
     quantum_num: i8,
     energy: f64  // Joules
+
+    // position as a simple vec??
+    position: Vec3::new(0., 0., 0.),
 }
 
 // #[derive(Debug)]
@@ -152,31 +219,32 @@ struct Electron {
 //     }
 // }
 
-fn calc_temp(nuclei: Vec<Nucleus>) -> f64 {
+fn _calc_temp(nuclei: Vec<Nucleus>) -> f64 {
     // todo temp isn't just the velocity!
     nuclei.iter().fold(0., |acc, a| acc + a.vel.mag())
 }
 
-fn energy(nuclei: Vec<Nucleus>, electrons: Vec<Electron>) -> f64 {
+fn _energy(nuclei: Vec<Nucleus>, electrons: Vec<Electron>) -> f64 {
     // Total energy? Vib + rot + translat?
     0.  // todo
 }
 
-fn nuc_poten_field(nuclei: Vec<Nucleus>, position: Vec3) -> f64 {
-    // Classical potential field
-    let mut result = 0.;
-    for nucleus in &nuclei {
-        let dist = (nucleus.position - position).mag();
-        result += k * nucleus.charge() / dist.powi(2);
-    }
-    result
-}
+// fn nuc_poten_field(nuclei: Vec<Nucleus>, position: Vec3) -> f64 {
+//     // Classical potential field
+//     let mut result = 0.;
+//     for nucleus in &nuclei {
+//         let dist = (nucleus.position - position).mag();
+//         result += k * nucleus.charge() / dist.powi(2);
+//     }
+//     result
+// }
 
 fn nuc_elec_field(nuclei: Vec<Nucleus>, position: Vec3) -> Vec3 {
     // Classical electric field.
+    // Points from positive to negative.
     let mut result = Vec3 {x: 0., y: 0., z: 0.};
     for nucleus in &nuclei {
-        let direc = nucleus.position - position;
+        let direc = position - nucleus.position;
         let dist = direc.mag();
         let unit_direc = div(direc, dist);
 
@@ -188,6 +256,42 @@ fn nuc_elec_field(nuclei: Vec<Nucleus>, position: Vec3) -> Vec3 {
     result
 }
 
+fn hamiltonian(nuclei: Vec<Nucleus>, electrons: Vec<Electron>) -> f64 {
+    // From P 22 of E. Cances et al.
+    const M = nuclei.len();
+    const N = electrons.len();
+    
+    // what are the Δx_k and Δ_i terms? or momentums. Add them in! dist?
+    let ke_nuc: f64 = nuclei.iter().fold(0., |acc, nuc| acc - 1/(2. * nuc.mass()));
+
+    let ke_elec: f64 = electrons.iter().fold(0., |acc, nuc| acc - 1/2.));
+
+    // Electrostatic energies
+    let mut electro_nuc_elec = 0.;
+    for nuc in &nuclei {
+        for elec in &electrons {
+            electro_nuc_elec -= nuc.charge() / (elec.position - nuc.position).abs();
+        }
+    }
+
+    let mut electro_elec_elec = 0.;
+    for elec1 in &electrons {
+        for elec2 in &electrons {
+            electro_nuc_elec += 1. / (elec1.position - elec2.position).abs();
+        }
+    }
+
+    let mut electro_nuc_nuc = 0.;
+    for nuc1 in &nuclei {
+        for nuc2 in &nuclei {
+            electro_nuc_elec += nuc1.charge() * nuc2.charge() / (elec1.position - elec2.position).abs();
+        }
+    }
+
+    ke_nuc + ke_elec + electro_nuc_elec + electro_elec_elec + electro_nuc_nuc
+
+}
+
 // fn nuc_poten_direc(nuclei: Vec<Nucleus>, position: Vec3) -> f64 {
 //     // Approximate the gradient of the field at this point.
 // }
@@ -195,9 +299,33 @@ fn nuc_elec_field(nuclei: Vec<Nucleus>, position: Vec3) -> Vec3 {
 fn main() {
     let mut state = State {
         temp: 300.,
-        nuclei: vec![],
+        nuclei: vec![
+            Nucleus::new(1, 1, Vec3::new(1., 1., 0.), Vec3::new(0., 0., 0.)),
+            Nucleus::new(1, 1, Vec3::new(-1., -1., 0.), Vec3::new(0., 0., 0.)),
+            Nucleus::new(1, 1, Vec3::new(-1., 1., 0.), Vec3::new(0., 0., 0.)),
+            Nucleus::new(1, 1, Vec3::new(1., -1., 0.), Vec3::new(0., 0., 0.)),
+        ],
         electrons: vec![],
     };
+
+    // todo this vs normal mut vec.
+    let state2: Rc<RefCell<State>> =
+        Rc::new(RefCell::new(
+            State {
+                temp: 300.,
+                nuclei: vec![
+                    Nucleus::new(1, 1, Vec3::new(1., 1., 0.), Vec3::new(0., 0., 0.)),
+                    Nucleus::new(1, 1, Vec3::new(-1., -1., 0.), Vec3::new(0., 0., 0.)),
+                    Nucleus::new(1, 1, Vec3::new(-1., 1., 0.), Vec3::new(0., 0., 0.)),
+                    Nucleus::new(1, 1, Vec3::new(1., -1., 0.), Vec3::new(0., 0., 0.)),
+                    ],
+                electrons: vec![],
+            }
+        ));
+
+    println!( "{:?}",
+        nuc_elec_field(state.nuclei, Vec3::new(0., 0., 0.))
+    );
 }
 
 
