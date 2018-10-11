@@ -1,4 +1,4 @@
-use std::f64::atan2;
+use std::fmt;
 use std::ops::{Add, Sub, Mul, Div};
 
 use consts::*;
@@ -10,7 +10,7 @@ pub struct State {
     pub electrons: Vec<Electron>,
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone)]
 pub struct Cplx {
     pub real: f64,
     pub im: f64,
@@ -21,12 +21,16 @@ impl Cplx {
         Self {real, im}
     }
 
+    pub fn conj(&self) -> Self {
+        Self {real: self.real, im: -self.im}
+    }
+
     pub fn mag(&self) -> f64 {
         (self.real.powi(2) + self.im.powi(2)).sqrt()
     }
 
     pub fn phase(&self) -> f64 {
-        atan2(self.im, self.real)
+        (self.im).atan2(self.real)
     }
 }
 
@@ -54,6 +58,12 @@ impl Mul for Cplx {
             real: self.real * other.real - self.im * other.im, 
             im: self.real * other.im + self.im * other.real,
         }
+    }
+}
+
+impl fmt::Display for Cplx {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{} + {}i", self.real, self.im)
     }
 }
 
@@ -169,8 +179,22 @@ pub struct Electron {
     pub quantum_num: i8,
     pub energy: f64,  // Joules
 
+    // Used as a starting point for calculating wavefunc.
+    pub expect_x: Vec3 // real?
+    pub expect_x_p: Vec3 // real?
+    pub ψ_0: Cplx // real?
+    pub ψ_p_0: Cplx // real?
+    // Where the above expectation values are defined for.
+    pub x_0: Vec3  
+    // todo rethink this
+
+    pub ψ: Vec<Vec<Vec<f64>>>,
+
     // position as a simple vec??
-    pub position: Vec3,
+    // pub position: Vec3,
+    // Time-independent Schrodinger equation, in which a potential function is
+    // already included.  Arguments are position to calculate at, and energy.
+    // pub ψ: Fn(&Vec3, f64) -> f64,
 }
 
 impl Electron {
