@@ -12,6 +12,7 @@ pub struct State {
 
 #[derive(Copy, Clone)]
 pub struct Cplx {
+    // todo should probably just use num::Complex
     pub real: f64,
     pub im: f64,
 }
@@ -175,6 +176,8 @@ enum Spin {
 
 #[derive(Debug)]
 pub struct Electron {
+    // todo spin x, y and z?
+    // pub spin: [Spin; 3];
     pub spin: Spin,
     pub quantum_num: i8,
     pub energy: f64,  // Joules
@@ -188,7 +191,8 @@ pub struct Electron {
     pub x_0: Vec3  
     // todo rethink this
 
-    pub ψ: Vec<Vec<Vec<f64>>>,
+    // Sollutions over 3 dimensions of space.
+    pub ψ: Vec<Vec<Vec<Cplx>>>,
 
     // position as a simple vec??
     // pub position: Vec3,

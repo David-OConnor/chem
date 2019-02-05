@@ -4,3 +4,5 @@ version = "0.1.0"
 authors = ["DavidOConnor <david.alan.oconnor@gmail.com>"]
 
 [dependencies]
+dataplotlib = "^0.1.3"
+num = "^0.2.0"

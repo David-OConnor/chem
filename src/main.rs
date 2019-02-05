@@ -34,7 +34,7 @@ use std::rc::Rc;  // todo For global state; may handle this in main() instead.
 use consts::*;
 use types::{Cplx, Electron, Nucleus, State, Vec3};
 
-fn deriv(f: &Fn(f64) -> f64, x: f64) -> f64 {
+fn _deriv(f: &Fn(f64) -> f64, x: f64) -> f64 {
     // Take a numerical derivative
     // May need to curry input functions to fit this format.
     let dx = 0.000001;  // smaller values are more precise
@@ -42,7 +42,7 @@ fn deriv(f: &Fn(f64) -> f64, x: f64) -> f64 {
 }
 
 // fn nbody_rhs(nuclei: Vec<Nucleus>, electrons: Vec<Electrons>, t) -> (Vec<)
-fn nbody_rhs(s: Vec<>. v: Vec<>, t: f64) -> (Vec<(f64, f64, f64), Vec<f64, f64, f64>) -> {
+fn nbody_rhs(s: Vec<>, v: Vec<>, t: f64) -> (Vec<(f64, f64, f64), Vec<f64, f64, f64>) {
     let temp = elec_ode();
 }
 
@@ -96,12 +96,11 @@ fn elec_ode(nuclei: &Vec<Nucleus>, electrons: &Vec<Electron>, elec: &Electron) {
     let x_span = (-10., 10.);
     let y_span = (-10., 10.);
     let z_span = (-10., 10.);
-    let step = .1;
+    let step = 0.1;
 
     let V = |posit| nuc_elec_potential(nuclei, posit) + elec_elec_potential(electrons, posit);
       
-    let solns = integrate::solve_pde_3d(elec_rhs, (x_span, y_span, z_span), ψ_0, V));
-    }
+    let solns = integrate::solve_pde_3d(elec_rhs, (x_span, y_span, z_span), ψ_0, V);
 }
 
 fn elec_posit_prob(nuclei: &Vec<Nucleus>, electrons: &Vec<Electron>, elec: &Electron, x: &Vec3) -> f64 {
@@ -136,7 +135,7 @@ fn _energy(nuclei: Vec<Nucleus>, electrons: Vec<Electron>) -> f64 {
 //     result
 // }
 
-fn nuc_elec_field(nuclei: &Vec<Nucleus>, position: Vec3) -> Vec3 {
+fn _nuc_elec_field(nuclei: &Vec<Nucleus>, position: Vec3) -> Vec3 {
     // Classical electric field.
     // Points from positive to negative.
     let mut result = Vec3 {x: 0., y: 0., z: 0.};
@@ -184,7 +183,7 @@ fn elec_elec_potential(electrons: &Vec<Electron>, position: &Vec3) -> f64 {
             positions.push((test_posit, prob));
             
         }
-        let total_posit = Vec3::new(0., 0., 0.);
+        let mut total_posit = Vec3::new(0., 0., 0.);
         for posit in positions {
             total_posit += posit.0.mul(posit.1)  // this whole mess is wrong todo
         }

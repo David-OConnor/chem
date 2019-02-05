@@ -8,7 +8,8 @@ pub const NEUTRON_MASS: f64 = 1.674929e-27;
 pub const ELECTRON_MASS: f64 = 9.109390e-31;
 
 // Atomic unit system.
-pub const m_e_UAS: f64 = 1.;
+pub const m_e_UAS: f64 = 0.00054858;
+pub const m_p_USAS: f64 = 1.;
 pub const e_UAS: f64 = 1.;
 pub const ħ_UAS: f64 = 1.;
 pub const ε_0_UAS: f64 = 1. / (4. * π);
