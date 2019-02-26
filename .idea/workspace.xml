@@ -2,14 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="63843798-86fc-4cf6-9df5-0d52eff0dddc" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/consts.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/prototype3d.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/prototype_radial.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/chem.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/chem.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/other.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/other.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/consts.py" beforeDir="false" afterPath="$PROJECT_DIR$/consts.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/prototype1d.py" beforeDir="false" afterPath="$PROJECT_DIR$/prototype1d.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -20,7 +15,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="CoverageDataManager">
-    <SUITE FILE_PATH="coverage/chem$1d.coverage" NAME="1d Coverage Results" MODIFIED="1551203065527" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/chem$1d.coverage" NAME="1d Coverage Results" MODIFIED="1551212681702" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="DatabaseView">
     <option name="SHOW_INTERMEDIATE" value="true" />
@@ -59,8 +54,8 @@
       <file leaf-file-name="prototype1d.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/prototype1d.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="336">
-              <caret line="72" column="23" selection-start-line="72" selection-start-column="23" selection-end-line="72" selection-end-column="23" />
+            <state relative-caret-position="252">
+              <caret line="83" column="25" lean-forward="true" selection-start-line="83" selection-start-column="25" selection-end-line="83" selection-end-column="25" />
               <folding>
                 <element signature="e#0#33#0" expanded="true" />
               </folding>
@@ -71,8 +66,8 @@
       <file leaf-file-name="consts.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/consts.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="160">
-              <caret line="10" column="6" selection-start-line="10" selection-start-column="6" selection-end-line="10" selection-end-column="6" />
+            <state relative-caret-position="80">
+              <caret line="5" column="7" lean-forward="true" selection-start-line="5" selection-start-column="7" selection-end-line="5" selection-end-column="7" />
             </state>
           </provider>
         </entry>
@@ -110,6 +105,8 @@
       <find>vec</find>
       <find>vec!</find>
       <find>vec3</find>
+      <find>simps</find>
+      <find>plt.plo</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -124,9 +121,9 @@
         <option value="$PROJECT_DIR$/src/main.rs" />
         <option value="$PROJECT_DIR$/prototype.py" />
         <option value="$PROJECT_DIR$/.gitignore" />
-        <option value="$PROJECT_DIR$/consts.py" />
         <option value="$PROJECT_DIR$/prototype_radial.py" />
         <option value="$PROJECT_DIR$/prototype3d.py" />
+        <option value="$PROJECT_DIR$/consts.py" />
         <option value="$PROJECT_DIR$/prototype1d.py" />
       </list>
     </option>
@@ -141,10 +138,10 @@
     <packageJsonPaths />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="1744" />
-    <option name="y" value="52" />
-    <option name="width" value="1593" />
-    <option name="height" value="1262" />
+    <option name="x" value="1939" />
+    <option name="y" value="126" />
+    <option name="width" value="1469" />
+    <option name="height" value="1190" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
@@ -272,31 +269,32 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="1744" y="52" width="1593" height="1262" extended-state="0" />
+    <frame x="1939" y="126" width="1469" height="1190" extended-state="0" />
+    <editor active="true" />
     <layout>
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="right" id="Cargo" order="3" weight="0.24681933" />
       <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
-      <window_info anchor="right" x="0" y="0" width="315" height="1062" id="Documentation" order="6" sideWeight="0.36959064" side_tool="true" visible="true" weight="0.5603392" />
+      <window_info anchor="right" x="0" y="0" width="348" height="1062" id="Documentation" order="6" sideWeight="0.3713491" side_tool="true" visible="true" weight="0.16039744" />
       <window_info anchor="bottom" id="Database Changes" order="7" show_stripe_button="false" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.32041588" />
       <window_info anchor="bottom" id="Version Control" order="7" />
-      <window_info anchor="bottom" id="Python Console" order="7" weight="0.25132743" />
-      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.24336283" />
+      <window_info anchor="bottom" id="Python Console" order="7" weight="0.2784314" />
       <window_info anchor="bottom" id="Terminal" order="7" weight="0.23274337" />
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.14807567" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.16323633" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="right" id="Database" order="4" weight="0.32951653" />
-      <window_info active="true" anchor="right" id="SciView" order="5" sideWeight="0.63040936" visible="true" weight="0.5603392" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.32862744" />
+      <window_info anchor="right" id="SciView" order="5" sideWeight="0.6286509" visible="true" weight="0.16039744" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39982578" />
+      <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" sideWeight="0.49941522" weight="0.24962631" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.32920355" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -662,15 +660,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/consts.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="160">
-          <caret line="10" column="6" selection-start-line="10" selection-start-column="6" selection-end-line="10" selection-end-column="6" />
+        <state relative-caret-position="80">
+          <caret line="5" column="7" lean-forward="true" selection-start-line="5" selection-start-column="7" selection-end-line="5" selection-end-column="7" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/prototype1d.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="336">
-          <caret line="72" column="23" selection-start-line="72" selection-start-column="23" selection-end-line="72" selection-end-column="23" />
+        <state relative-caret-position="252">
+          <caret line="83" column="25" lean-forward="true" selection-start-line="83" selection-start-column="25" selection-end-line="83" selection-end-column="25" />
           <folding>
             <element signature="e#0#33#0" expanded="true" />
           </folding>
