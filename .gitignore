@@ -1,2 +1,13 @@
+# Standard ignores. They don't affect code usability.
+__pycache__/
+Thumbs.db
+*.egg-info/
+.ipynb_checkpoints/
+venv/
+
+# Pycharm
+*.iws
+workspace.xml
+
 /target
 **/*.rs.bk
