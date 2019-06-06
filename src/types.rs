@@ -183,16 +183,18 @@ pub struct Electron {
     pub energy: f64,  // Joules
 
     // Used as a starting point for calculating wavefunc.
-    pub expect_x: Vec3 // real?
-    pub expect_x_p: Vec3 // real?
-    pub ψ_0: Cplx // real?
-    pub ψ_p_0: Cplx // real?
+    pub expect_x: Vec3, // real?
+    pub expect_x_p: Vec3, // real?
+    pub ψ_0: Cplx, // real?
+    pub ψ_p_0: Cplx, // real?
     // Where the above expectation values are defined for.
-    pub x_0: Vec3  
+    pub x_0: Vec3,
     // todo rethink this
 
     // Sollutions over 3 dimensions of space.
     pub ψ: Vec<Vec<Vec<Cplx>>>,
+        // todo: ψ as a function?
+        // pub ψ: fn(Vec3) -> Cplx,
 
     // position as a simple vec??
     // pub position: Vec3,
@@ -206,4 +208,14 @@ impl Electron {
         // Calculate the expectation value of this electron. Not sure
         // if this is even appropriate, and if so, how to do so.
     }
+}
+
+#[derive(Debug)]
+pub struct Electron2 {
+    pub spin: Spin,
+
+    // Solutions over 3 dimensions of space.
+    pub ψ: Vec<Vec<Vec<Cplx>>>,
+    // todo: ψ as a function?
+    // pub ψ: fn(Vec3) -> Cplx,
 }
