@@ -33,13 +33,36 @@ V_prev: Callable = lambda sx: 0
 
 @dataclass
 class Fourier:
-    """A fourier series to arbitrary precision"""
+    """A Fourier series to arbitrary precision"""
     a_0: complex
     coeffs: List[Tuple[complex, complex]]  # ie [(a1, b1), (a2, b2)]
 
     # @classmethod
     # def from_fn(cls, a_0: float, fn: Callable, precision: float):
     #     Fourier(a_0, callable(, 0) for n in range(1, 100))
+
+    def value(self, x: complex) -> complex:
+        result = self.a_0 / 2
+        for n_, (a, b) in enumerate(self.coeffs, 1):
+            result += a * np.cos(n_*x) + b * np.sin(n_*x)
+        return result
+
+    def plot(self, range_: Tuple[float, float]) -> None:
+        x = np.linspace(range_[0], range_[1], 1000)
+        y = []
+        for v in x:
+            y.append(self.value(v))
+
+        plt.plot(x, y)
+        plt.show()
+
+
+@dataclass
+class Taylor:
+    """A Taylor series to arbitrary precision"""
+    # todo: Could combine with fourier?
+    a: complex
+    coeffs: List[Tuple[complex, complex]]  # ie [(a1, b1), (a2, b2)]
 
     def value(self, x: complex) -> complex:
         result = self.a_0 / 2
