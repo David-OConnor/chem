@@ -4,6 +4,7 @@ from functools import partial
 from typing import List, Iterable, Callable, Tuple
 
 import numpy as np
+from math import factorial
 import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp, simps
 
@@ -36,6 +37,7 @@ class Fourier:
     """A Fourier series to arbitrary precision"""
     a_0: complex
     coeffs: List[Tuple[complex, complex]]  # ie [(a1, b1), (a2, b2)]
+    P: float  # Period
 
     # @classmethod
     # def from_fn(cls, a_0: float, fn: Callable, precision: float):
@@ -44,7 +46,7 @@ class Fourier:
     def value(self, x: complex) -> complex:
         result = self.a_0 / 2
         for n_, (a, b) in enumerate(self.coeffs, 1):
-            result += a * np.cos(n_*x) + b * np.sin(n_*x)
+            result += a * np.cos(2*π*n_*x / self.P) + b * np.sin(2*π*n_*x / self.P)
         return result
 
     def plot(self, range_: Tuple[float, float]) -> None:
@@ -60,14 +62,13 @@ class Fourier:
 @dataclass
 class Taylor:
     """A Taylor series to arbitrary precision"""
-    # todo: Could combine with fourier?
-    a: complex
-    coeffs: List[Tuple[complex, complex]]  # ie [(a1, b1), (a2, b2)]
+    a: complex  # The center
+    coeffs: List[complex]  # ie f(a), f'(a), f''(a)...
 
     def value(self, x: complex) -> complex:
-        result = self.a_0 / 2
-        for n_, (a, b) in enumerate(self.coeffs, 1):
-            result += a * np.cos(n_*x) + b * np.sin(n_*x)
+        result = 0
+        for n_, f_a in enumerate(self.coeffs):
+            result += f_a * (x-self.a)**n_ / factorial(n_)
         return result
 
     def plot(self, range_: Tuple[float, float]) -> None:
@@ -81,13 +82,16 @@ class Taylor:
 
 
 def fourier_ode():
+    """
+    Assume BVP, where boundaries are the value goes to 0 at +- ∞
+    """
     y_0 = (0, 1)
     t = (0, 10)
     dt = 0.1
 
     rhs = lambda x, dx: dx
 
-
+    f = Fourier(0, [(1, 1), (1, 1), 2*np.pi])
 
 
 @dataclass
@@ -143,6 +147,18 @@ def elec(E: float, V: Callable, ψ0: float, ψ_p0: float):
     return soln
 
 
+def elec_b(E: float, V: Callable):
+    """
+    Calculate the wave function for electrons in an arbitrary potential, at a single snapshot
+    in time.
+    """
+    x_span = (-10, 10)
+
+
+
+    return soln
+
+
 def nuc_potential(nuclei: Iterable[Nucleus], sx: float) -> float:
     # In 1d, we have no angular momentum/centripetal potential: Only coulomb potential.
     result = 0
@@ -154,9 +170,11 @@ def nuc_potential(nuclei: Iterable[Nucleus], sx: float) -> float:
 
 
 def find_ψ_p0(ψ0: float=1/2, E: float=-.01) -> float:
-    """There should be only one bound state corresponding to a combination of ψ0 and E.
+    """
+    There should be only one bound state corresponding to a combination of ψ0 and E.
     I suspect that it's really only 1 bound state for a given E, where all ψ0 and ψ'0 combinations
-    that normalize are equivalent."""
+    that normalize are equivalent.
+    """
 
     # Use the shooting method to find our solution. Narrow down the range of possible values
     # iteratively.
@@ -260,6 +278,18 @@ def hydrogen_static(ψ0, ψ_p0, E: float):
     return elec(E, V, ψ0, ψ_p0)
 
 
+def hydrogen_static_b(E: float):
+    """A time-independet simulation of the electron cloud surrounding a hydrogen atom"""
+
+    # ground level hydrogen: 13.6eV
+
+    # Negative E implies bound state; positive scattering.
+    # ψ_p0 should be 0 for continuity across the origin.
+
+    V = partial(nuc_potential, [Nucleus(1, 0, 0, 0)])
+    return elec_b(E, V)
+
+
 # def find_ics(E: float) -> Tuple[float, float]:
 #     """Return (ψ0, ψ'0) for the normalized bound state at the given energy."""
 #     ψ0 = 1  # Arbitrary starting value.
@@ -318,8 +348,21 @@ def calc_hydrogen_static():
     return soln
 
 
+def calc_hydrogen_static_b():
+    """As a BVP"""
+    ψ0 = 1
+    # E = find_E(ψ0, ψ_p0)
+    E = -0.1
+
+    # Hard boundaries of soln must be normalizable.
+
+    soln = hydrogen_static_b(E)
+
+    return soln
+
+
 def plot_hydrogen_static():
-    soln = calc_hydrogen_static()
+    soln = calc_hydrogen_static_b()
     plt.plot(soln.t, soln.y[0])
     plt.show()
 
@@ -407,7 +450,8 @@ def nbody():
     plt.show()
 
 
-plot_hydrogen_static()
+if __name__ == "__main__":
+    plot_hydrogen_static()
 # plot_ics()
 
 # find_ψ_p0()
