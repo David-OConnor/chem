@@ -60,6 +60,33 @@ class Fourier:
 
 
 @dataclass
+class FourierCplx:
+    """A Fourier series to arbitrary precision, in the complex plane"""
+    coeffs: List[complex]
+    P: float  # Period
+    i = complex(0, 1)
+
+    def value(self, t: float) -> complex:
+        τ = 2 * np.pi
+        result = 0
+        for n_, c in enumerate(self.coeffs):
+            result += c * np.exp(n_*τ*i*t / self.P)
+        return result
+
+    def plot(self, range_: Tuple[float, float]) -> None:
+        t = np.linspace(range_[0], range_[1], 1000)
+        y = []
+        x = []
+        for v in t:
+            value = self.value(v)
+            x.append(value.real)
+            y.append(value.imag)
+
+        plt.scatter(x, y)
+        plt.show()
+
+
+@dataclass
 class Taylor:
     """A Taylor series to arbitrary precision"""
     a: complex  # The center
@@ -139,24 +166,10 @@ def elec(E: float, V: Callable, ψ0: float, ψ_p0: float):
     Calculate the wave function for electrons in an arbitrary potential, at a single snapshot
     in time.
     """
-    x_span = (1e-10, 1300)
-
-    rhs = partial(schrod, E, V)
-    soln = solve_ivp(rhs, x_span, (ψ0, ψ_p0), t_eval=np.linspace(x_span[0], x_span[1], 10000))
-
-    return soln
-
-
-def elec_b(E: float, V: Callable):
-    """
-    Calculate the wave function for electrons in an arbitrary potential, at a single snapshot
-    in time.
-    """
     x_span = (-10, 10)
 
-
-
-    return soln
+    rhs = partial(schrod, E, V)
+    return solve_ivp(rhs, x_span, (ψ0, ψ_p0), t_eval=np.linspace(x_span[0], x_span[1], 10000))
 
 
 def nuc_potential(nuclei: Iterable[Nucleus], sx: float) -> float:
@@ -169,103 +182,7 @@ def nuc_potential(nuclei: Iterable[Nucleus], sx: float) -> float:
     return result
 
 
-def find_ψ_p0(ψ0: float=1/2, E: float=-.01) -> float:
-    """
-    There should be only one bound state corresponding to a combination of ψ0 and E.
-    I suspect that it's really only 1 bound state for a given E, where all ψ0 and ψ'0 combinations
-    that normalize are equivalent.
-    """
-
-    # Use the shooting method to find our solution. Narrow down the range of possible values
-    # iteratively.
-
-    START = -10
-    END = 10
-    check_x = 6000  # Value to confirm soln is close to 0. Higher is more precise.
-    ϵ = 1e-4  # Set smaller for higher precision, but isn't as sensitive as check_x.
-
-    MAX_ATTEMPTS = 10000
-    MAX_PRECISION = 1e-17  # Just return the result if upper and lower are very close
-
-    lower = START
-    upper = END
-    guess = (END - START) / 2
-
-    for i in range(MAX_ATTEMPTS):
-        soln = hydrogen_static(ψ0, guess, E)
-
-        # ψ should be near 0 for a bound state when far from the origin, represented
-        # by check_val
-        # check_val = soln.y[int(len(soln.y) / 2)][0]  # todo nope. Find closest to t!
-        check_val = soln.y[0][800]  # todo nope. Find closest to t!
-
-        # Debugging code
-        # print(f"upper:{upper}, lower:{lower}, guess:{guess}, check: {check_val}")
-        # plt.plot(soln.y[0])
-        # plt.show()
-
-        if abs(check_val) <= ϵ or abs(upper - lower) <= MAX_PRECISION:
-            return guess
-
-        # Assume negative check_val means our guess is too low.
-        if check_val < 0:
-            # We know the soln is bounded below by lower.
-            lower = guess
-            guess += (upper - lower) / 2
-        else:
-            upper = guess
-            guess -= (upper - lower) / 2
-    return guess
-
-
-def find_E(ψ0, ψ_p0) -> float:
-    """"""
-    # Use the shooting method to find our solution. Narrow down the range of possible values
-    # iteratively.
-
-    START = -10
-    END = 0  # Positive energies mean scattering states.
-
-    CHECK_X = 20  # Value to confirm soln is close to 0. Higher is more precise.
-    ϵ = 1e-4  # Set smaller for higher precision, but isn't as sensitive as check_x.
-
-    MAX_ATTEMPTS = 10000
-    MAX_PRECISION = 1e-18  # Just return the result if upper and lower are very close
-
-    lower = START
-    upper = END
-    guess = -(END - START) / 2
-
-    for i in range(MAX_ATTEMPTS):
-        soln = hydrogen_static(ψ0, ψ_p0, guess)
-        print(soln.y[0], "Y")
-
-        # ψ should be near 0 for a bound state when far from the origin, represented
-        # by check_val
-        check_val = soln.y[0][np.where(soln.t > CHECK_X)][0]
-
-        # Debugging code
-        print(f"upper:{upper}, lower:{lower}, guess:{guess}, check: {check_val}")
-        # plt.plot(soln.y[0])
-        # plt.show()
-
-        if abs(check_val) <= ϵ or abs(upper - lower) <= MAX_PRECISION:
-            return guess
-
-        # Assume negative check_val means our guessed energy is too high.
-        # Low e overshoots, high E undershoots.
-        if check_val < 0:
-            # We know the soln is bounded below by lower.
-            upper = guess
-            guess -= (upper - lower) / 2
-        else:
-            lower = guess
-            guess += (upper - lower) / 2
-
-    return guess
-
-
-def hydrogen_static(ψ0, ψ_p0, E: float):
+def h_static(ψ0, ψ_p0, E: float):
 
     """A time-independet simulation of the electron cloud surrounding a hydrogen atom"""
 
@@ -274,64 +191,46 @@ def hydrogen_static(ψ0, ψ_p0, E: float):
     # Negative E implies bound state; positive scattering.
     # ψ_p0 should be 0 for continuity across the origin.
 
-    V = partial(nuc_potential, [Nucleus(1, 0, 0, 0)])
+    # todo: In atomic units this doesn't matter, but aren't we leaving out
+    # todo an e? ie e^2
+    V_elec = partial(nuc_potential, [Nucleus(1, 0, 0, 0)])
+
+    return elec(E, V_elec, ψ0, ψ_p0)
+
+
+def h_static_sph(ψ0: float, ψ_p0: float, E: float):
+
+    """A time-independet simulation of the electron cloud surrounding a hydrogen atom"""
+
+    # ground level hydrogen: 13.6eV, or 1 hartree
+
+    # Negative E implies bound state; positive scattering.
+    # ψ_p0 should be 0 for continuity across the origin.
+
+    # todo: are
+    V_elec = partial(nuc_potential, [Nucleus(1, 0, 0, 0)])
+
+    l = 0  # what should this be?
+    V_centrip = lambda r: ħ**2 * l*(l+1) / (2*m_e * r**2)
+    V = lambda r: V_elec(r) + V_centrip(r)
+
+    # x = np.linspace(.01, 10, 1000)
+    # y = V(x)
+    # plt.plot(x, y)
+    # plt.show()
+    # return
+
     return elec(E, V, ψ0, ψ_p0)
 
 
-def hydrogen_static_b(E: float):
-    """A time-independet simulation of the electron cloud surrounding a hydrogen atom"""
-
-    # ground level hydrogen: 13.6eV
-
-    # Negative E implies bound state; positive scattering.
-    # ψ_p0 should be 0 for continuity across the origin.
-
-    V = partial(nuc_potential, [Nucleus(1, 0, 0, 0)])
-    return elec_b(E, V)
-
-
-# def find_ics(E: float) -> Tuple[float, float]:
-#     """Return (ψ0, ψ'0) for the normalized bound state at the given energy."""
-#     ψ0 = 1  # Arbitrary starting value.
-#     # ψ0 = find_ψ0(E)
-#     ψ_p0 = find_ψ_p0(ψ0, E)
-#
-#     soln = hydrogen_static(ψ0, ψ_p0, E)
-#     norm = simps(soln.y[0][:500]) * 2
-#
-#     # Now that we know how to normalize, modify ψ0 appropriately:
-#
-#     return ψ0 / norm, find_ψ_p0(ψ0/norm, E)
-
-
-# def plot_ics():
-#     """Plot the initial conditions over bound state."""
-#     SIZE = 20
-#     E = np.linspace(0, -.3, SIZE)
-#     ψ0 = np.empty(SIZE)
-#     ψ_p0 = np.empty(SIZE)
-#
-#     for i in range(SIZE):
-#         ψ0[i], ψ_p0[i] = find_ics(E[i])
-#
-#     print(ψ0)
-#     print(ψ_p0)
-#
-#     plt.plot(E, ψ0)
-#     plt.show()
-#
-#     plt.plot(E, ψ_p0)
-#     plt.show()
-
-
 def calc_hydrogen_static():
-    ψ0 = 1
+    ψ0 = 0
     ψ_p0 = 1
     # E = find_E(ψ0, ψ_p0)
-    E = -0.001
+    E = -.3
 
-    soln = hydrogen_static(ψ0, ψ_p0, E)
-    norm = simps(soln.y[0][np.where(soln.t < 600)]**2) * 2
+    soln = h_static(ψ0, ψ_p0, E)
+    # norm = simps(soln.y[0][np.where(soln.t < 600)]**2) * 2
 
     # Now recalculate, normalized
     # ψ0 /= norm
@@ -343,26 +242,31 @@ def calc_hydrogen_static():
     # soln.y /= norm
     # norm = simps(soln.y[0][np.where(soln.t < 500)]) * 2
 
-    print("ψ0", ψ0, "ψ'0", ψ_p0, "E", E, "NORM: ", norm)
+    # print("ψ0", ψ0, "ψ'0", ψ_p0, "E", E, "NORM: ", norm)
 
     return soln
 
 
-def calc_hydrogen_static_b():
-    """As a BVP"""
-    ψ0 = 1
-    # E = find_E(ψ0, ψ_p0)
-    E = -0.1
+def calc_h_sph():
+    """In spherical coordinates."""
+    ψ0 = 0
+    ψ_p0 = 1
+    E = -.5
+    # E = 0.0367493 * -3.4
 
-    # Hard boundaries of soln must be normalizable.
-
-    soln = hydrogen_static_b(E)
+    soln = h_static_sph(ψ0, ψ_p0, E)
 
     return soln
 
 
 def plot_hydrogen_static():
-    soln = calc_hydrogen_static_b()
+    soln = calc_hydrogen_static()
+    plt.plot(soln.t, soln.y[0])
+    plt.show()
+
+
+def plot_h_sph():
+    soln = calc_h_sph()
     plt.plot(soln.t, soln.y[0])
     plt.show()
 
@@ -452,6 +356,7 @@ def nbody():
 
 if __name__ == "__main__":
     plot_hydrogen_static()
+
 # plot_ics()
 
 # find_ψ_p0()

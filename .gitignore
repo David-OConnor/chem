@@ -4,6 +4,7 @@ Thumbs.db
 *.egg-info/
 .ipynb_checkpoints/
 venv/
+__pypackages__/
 
 # Pycharm
 *.iws

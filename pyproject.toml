@@ -1,0 +1,14 @@
+[tool.pyflow]
+name = "Chem"
+py_version = "3.7"
+version = "0.0.1"
+author = "David O'Connor"
+scripts = { h = "prototype1d:plot_hydrogen_static", h3 = "prototype1d:plot_h_sph", op = "operator:main" }
+
+[tool.pyflow.dependencies]
+ipython = "^7.5.0"
+matplotlib = "^3.1.0"
+numpy = "^1.16.4"
+scipy = "^1.3.0"
+toolz = "^0.9.0"
+pyqt5 = "^5.13.0"
