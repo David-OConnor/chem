@@ -15,6 +15,8 @@ ATOM_ARR_LEN = 5
 # A global state var
 V_prev: Callable = lambda sx: 0
 
+import op
+
 
 # Lookin into matrix mechanics, and Feynman path integral approaches too
 
@@ -31,94 +33,6 @@ V_prev: Callable = lambda sx: 0
 
 # Free variables: 2? Energy, and ψ_p_0(ψ). Eg we can set ψ to what we wish, find the ψ_p that
 # works with it (and the E set), then normalize.
-
-@dataclass
-class Fourier:
-    """A Fourier series to arbitrary precision"""
-    a_0: complex
-    coeffs: List[Tuple[complex, complex]]  # ie [(a1, b1), (a2, b2)]
-    P: float  # Period
-
-    # @classmethod
-    # def from_fn(cls, a_0: float, fn: Callable, precision: float):
-    #     Fourier(a_0, callable(, 0) for n in range(1, 100))
-
-    def value(self, x: complex) -> complex:
-        result = self.a_0 / 2
-        for n_, (a, b) in enumerate(self.coeffs, 1):
-            result += a * np.cos(2*π*n_*x / self.P) + b * np.sin(2*π*n_*x / self.P)
-        return result
-
-    def plot(self, range_: Tuple[float, float]) -> None:
-        x = np.linspace(range_[0], range_[1], 1000)
-        y = []
-        for v in x:
-            y.append(self.value(v))
-
-        plt.plot(x, y)
-        plt.show()
-
-
-@dataclass
-class FourierCplx:
-    """A Fourier series to arbitrary precision, in the complex plane"""
-    coeffs: List[complex]
-    P: float  # Period
-    i = complex(0, 1)
-
-    def value(self, t: float) -> complex:
-        τ = 2 * np.pi
-        result = 0
-        for n_, c in enumerate(self.coeffs):
-            result += c * np.exp(n_*τ*i*t / self.P)
-        return result
-
-    def plot(self, range_: Tuple[float, float]) -> None:
-        t = np.linspace(range_[0], range_[1], 1000)
-        y = []
-        x = []
-        for v in t:
-            value = self.value(v)
-            x.append(value.real)
-            y.append(value.imag)
-
-        plt.scatter(x, y)
-        plt.show()
-
-
-@dataclass
-class Taylor:
-    """A Taylor series to arbitrary precision"""
-    a: complex  # The center
-    coeffs: List[complex]  # ie f(a), f'(a), f''(a)...
-
-    def value(self, x: complex) -> complex:
-        result = 0
-        for n_, f_a in enumerate(self.coeffs):
-            result += f_a * (x-self.a)**n_ / factorial(n_)
-        return result
-
-    def plot(self, range_: Tuple[float, float]) -> None:
-        x = np.linspace(range_[0], range_[1], 1000)
-        y = []
-        for v in x:
-            y.append(self.value(v))
-
-        plt.plot(x, y)
-        plt.show()
-
-
-def fourier_ode():
-    """
-    Assume BVP, where boundaries are the value goes to 0 at +- ∞
-    """
-    y_0 = (0, 1)
-    t = (0, 10)
-    dt = 0.1
-
-    rhs = lambda x, dx: dx
-
-    f = Fourier(0, [(1, 1), (1, 1), 2*np.pi])
 
 
 @dataclass
@@ -191,8 +105,6 @@ def h_static(ψ0, ψ_p0, E: float):
     # Negative E implies bound state; positive scattering.
     # ψ_p0 should be 0 for continuity across the origin.
 
-    # todo: In atomic units this doesn't matter, but aren't we leaving out
-    # todo an e? ie e^2
     V_elec = partial(nuc_potential, [Nucleus(1, 0, 0, 0)])
 
     return elec(E, V_elec, ψ0, ψ_p0)
@@ -225,48 +137,37 @@ def h_static_sph(ψ0: float, ψ_p0: float, E: float):
 
 def calc_hydrogen_static():
     ψ0 = 0
-    ψ_p0 = 1
-    # E = find_E(ψ0, ψ_p0)
-    E = -.3
+    ψ_p0 = -1
+
+    # E should be a whittaker energy, ie -1/2, -2/9, -1/8, -.08 etc
+    # Only odd states (n = 1, 3, 5 etc) correspond to 3d H atom.
+    n = 1
+    E = -2/(n+1)**2
+
+    E = 50
 
     soln = h_static(ψ0, ψ_p0, E)
-    # norm = simps(soln.y[0][np.where(soln.t < 600)]**2) * 2
-
-    # Now recalculate, normalized
-    # ψ0 /= norm
-    # E = find_E(ψ0)
-    # soln = hydrogen_static(ψ0, ψ_p0, E)
-    # norm = simps(soln.y[0][np.where(soln.t < 500)]) * 2
-
-    # Normalize todo: Is this an acceptible way of doing it?
-    # soln.y /= norm
-    # norm = simps(soln.y[0][np.where(soln.t < 500)]) * 2
-
-    # print("ψ0", ψ0, "ψ'0", ψ_p0, "E", E, "NORM: ", norm)
 
     return soln
 
 
-def calc_h_sph():
-    """In spherical coordinates."""
-    ψ0 = 0
-    ψ_p0 = 1
-    E = -.5
-    # E = 0.0367493 * -3.4
+def calc_h_static_eig():
+    D = op.diff_op()
+    D2 = D @ D
 
-    soln = h_static_sph(ψ0, ψ_p0, E)
+    E = -1/2
+    N = 50
+    x = np.linspace(N) - 25
 
-    return soln
+    V = nuc_potential([Nucleus(1, 0, 0, 0)], x)
+
+    return 1/(2*E*V) * (D2 @ x)
 
 
 def plot_hydrogen_static():
+    # soln = calc_hydrogen_static()
     soln = calc_hydrogen_static()
-    plt.plot(soln.t, soln.y[0])
-    plt.show()
 
-
-def plot_h_sph():
-    soln = calc_h_sph()
     plt.plot(soln.t, soln.y[0])
     plt.show()
 
