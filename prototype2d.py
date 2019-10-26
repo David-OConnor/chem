@@ -65,6 +65,8 @@ def elec(E: float, V: Callable, ψ0: float, ψ_p0: float):
     Calculate the wave function for electrons in an arbitrary potential, at a single snapshot
     in time.
     """
+    # todo: Currently does not include elec-elec interactions.
+
     x_span = (-10, 10)
 
     rhs = partial(schrod, E, V)
@@ -83,9 +85,7 @@ def nuc_potential(nuclei: Iterable[Nucleus], sx: float, sy: float) -> float:
 
 def h_static(ψ0, ψ_p0, E: float):
     """A time-independent simulation of the electron cloud surrounding a hydrogen atom"""
-
-    V_elec = partial(nuc_potential, [Nucleus(1, 0, 0, 0)])
-
+    V_elec = partial(nuc_potential, [Nucleus(1, 0, 0, 0, 0, 0)])
     return elec(E, V_elec, ψ0, ψ_p0)
 
 

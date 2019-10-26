@@ -1,21 +1,24 @@
 from dataclasses import dataclass
 
+
 from functools import partial
 from typing import List, Iterable, Callable, Tuple
 
 import numpy as np
-from math import factorial
+from numpy import exp, sqrt
 import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp, simps
 
 from consts import *
+import op
 
 ATOM_ARR_LEN = 5
 
 # A global state var
 V_prev: Callable = lambda sx: 0
 
-import op
+i = complex(0, 1)
+
 
 
 # Lookin into matrix mechanics, and Feynman path integral approaches too
@@ -33,7 +36,6 @@ import op
 
 # Free variables: 2? Energy, and ψ_p_0(ψ). Eg we can set ψ to what we wish, find the ψ_p that
 # works with it (and the E set), then normalize.
-
 
 @dataclass
 class Nucleus:
@@ -67,25 +69,6 @@ def atoms_to_array(atoms: List[Nucleus]) -> np.array:
     return result
 
 
-def schrod(E: float, V: Callable, x: float, y):
-    ψ, φ = y
-    ψ_p = φ
-    φ_p = 2 * m_e / ħ ** 2 * (V(x) - E) * ψ
-
-    return ψ_p, φ_p
-
-
-def elec(E: float, V: Callable, ψ0: float, ψ_p0: float):
-    """
-    Calculate the wave function for electrons in an arbitrary potential, at a single snapshot
-    in time.
-    """
-    x_span = (-10, 10)
-
-    rhs = partial(schrod, E, V)
-    return solve_ivp(rhs, x_span, (ψ0, ψ_p0), t_eval=np.linspace(x_span[0], x_span[1], 10000))
-
-
 def nuc_potential(nuclei: Iterable[Nucleus], sx: float) -> float:
     # In 1d, we have no angular momentum/centripetal potential: Only coulomb potential.
     result = 0
@@ -96,80 +79,112 @@ def nuc_potential(nuclei: Iterable[Nucleus], sx: float) -> float:
     return result
 
 
-def h_static(ψ0, ψ_p0, E: float):
+def ti_schrod(E: float, V: Callable, x: float, y):
+    ψ, φ = y
+    ψ_p = φ
+    φ_p = 2 * m_e / ħ ** 2 * (V(x) - E) * ψ
 
-    """A time-independet simulation of the electron cloud surrounding a hydrogen atom"""
-
-    # ground level hydrogen: 13.6eV
-
-    # Negative E implies bound state; positive scattering.
-    # ψ_p0 should be 0 for continuity across the origin.
-
-    V_elec = partial(nuc_potential, [Nucleus(1, 0, 0, 0)])
-
-    return elec(E, V_elec, ψ0, ψ_p0)
+    return ψ_p, φ_p
 
 
-def h_static_sph(ψ0: float, ψ_p0: float, E: float):
-
-    """A time-independet simulation of the electron cloud surrounding a hydrogen atom"""
-
-    # ground level hydrogen: 13.6eV, or 1 hartree
-
-    # Negative E implies bound state; positive scattering.
-    # ψ_p0 should be 0 for continuity across the origin.
-
-    # todo: are
-    V_elec = partial(nuc_potential, [Nucleus(1, 0, 0, 0)])
-
-    l = 0  # what should this be?
-    V_centrip = lambda r: ħ**2 * l*(l+1) / (2*m_e * r**2)
-    V = lambda r: V_elec(r) + V_centrip(r)
-
-    # x = np.linspace(.01, 10, 1000)
-    # y = V(x)
-    # plt.plot(x, y)
-    # plt.show()
-    # return
-
-    return elec(E, V, ψ0, ψ_p0)
+def elec(E: float, V: Callable, ψ0: float, ψ_p0: float, x_span: Tuple[float, float]):
+    """
+    Calculate the wave function for electrons in an arbitrary potential, at a single snapshot
+    in time.
+    """
 
 
-def calc_hydrogen_static():
+    rhs = partial(ti_schrod, E, V)
+    return solve_ivp(rhs, x_span, (ψ0, ψ_p0), t_eval=np.linspace(x_span[0], x_span[1], 10000))
+
+
+def h_static(E: float) -> Tuple[np.ndarray, np.ndarray]:
     ψ0 = 0
-    ψ_p0 = -1
+    ψ_p0 = -.0001
+    x_span = (-40, 0.0001)
 
+    V_elec = partial(nuc_potential, [Nucleus(1, 0, 0, 0)])
+
+    # Left and right of the x=0 coulomb singularity. Assume odd solution around x=0.
+    soln_orig = elec(E, V_elec, ψ0, ψ_p0, x_span)
+    soln_left = soln_orig.y[0]
+    soln_right = np.flip(soln_left)
+    soln = np.concatenate([soln_left, -soln_right])
+    t = np.concatenate([soln_orig.t, np.flip(-soln_orig.t)])
+
+    norm = simps(np.conj(soln) * soln, x=t)
+    return t, soln/norm**.5
+
+
+def evolve(state: np.ndarray, t0: float, t: float, E: float) -> np.ndarray:
+    """e^(-itH/ħ)"""
+    # todo eig st basis?
+    # e^(i*E*t/ħ)
+    # Assume H doesn't depend on time?
+    # H w/power expansion instead of E ??
+    # print(exp(-i*(t - t0) * E / ħ))
+    return state * exp(-i*(t - t0) * E / ħ)
+
+
+def td_schrod(E: float, V: Callable, x: float, ψ: complex):
+    return E * ψ / (i*ħ)
+
+
+def evolve2(state: np.ndarray, t0: float, t: float, E: float):
+    """iħ*dψ/dt = Hψ"""
+    t_span = (-10, 10)
+    ψ0, ψ_p0 = 0, 1
+
+    rhs = partial(ti_schrod, E)
+    return solve_ivp(rhs, t_span, (ψ0, ψ_p0), t_eval=np.linspace(t_span[0], t_span[1], 10000))
+
+
+def plot_h_static():
+    # Negative E implies bound state; positive scattering.
+    # ψ_p0 should be 0 for continuity across the origin.
     # E should be a whittaker energy, ie -1/2, -2/9, -1/8, -.08 etc
     # Only odd states (n = 1, 3, 5 etc) correspond to 3d H atom.
     n = 1
     E = -2/(n+1)**2
 
-    E = 50
+    t, ψ = h_static(E)
 
-    soln = h_static(ψ0, ψ_p0, E)
+    fig, ax = plt.subplots()
+    ax.plot(t, ψ)
+    ax.plot(t, np.conj(ψ) * ψ)
 
-    return soln
+    integ = simps(np.conj(ψ) * ψ, x=t)
+    # print("Norm sq: ", integ)
 
-
-def calc_h_static_eig():
-    D = op.diff_op()
-    D2 = D @ D
-
-    E = -1/2
-    N = 50
-    x = np.linspace(N) - 25
-
-    V = nuc_potential([Nucleus(1, 0, 0, 0)], x)
-
-    return 1/(2*E*V) * (D2 @ x)
-
-
-def plot_hydrogen_static():
-    # soln = calc_hydrogen_static()
-    soln = calc_hydrogen_static()
-
-    plt.plot(soln.t, soln.y[0])
+    ax.grid(True)
+    plt.xlim(-10, 10)
     plt.show()
+
+
+def plot_h_static_evolve():
+    dt = 0.01
+
+    n = 1
+    E = -2 / (n + 1) ** 2 # must match in calc_hydrogen static
+
+    soln = h_static(E)
+    for i in range(1):
+        evolved = evolve(soln.y[0]**2, 0, dt, E)
+        plt.plot(soln.t, evolved)
+
+    plt.show()
+
+    # def calc_h_static_eig():
+    #     D = op.diff_op()
+    #     D2 = D @ D
+    #
+    #     E = -1/2
+    #     N = 50
+    #     x = np.linspace(N) - 25
+    #
+    #     V = nuc_potential([Nucleus(1, 0, 0, 0)], x)
+    #
+    #     return 1/(2*E*V) * (D2 @ x)
 
 
 def electron_potential(soln, n_electrons, sx: float) -> float:

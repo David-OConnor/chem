@@ -117,6 +117,17 @@ def flatten2d(A: np.ndarray) -> np.ndarray:
     return np.concatenate([A.flatten(), A.T.flatten()])
 
 
+def flatten3d(A: np.ndarray) -> np.ndarray:
+    """Convert to a format that can be differentiated with a 1d solver."""
+    return np.concatenate([
+        np.transpose(A, [0, 1, 2]).flatten(),
+        # There's a somewhat arbitrary choice about which 3 of the 6
+        # tranpsoses to use?
+        np.transpose(A, [1, 0, 2]).flatten(),
+        np.transpose(A, [1, 2, 0]).flatten(),
+    ])
+
+
 def reassemble2d(A: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     """Undo flatten"""
     N_ = int(np.sqrt(A.shape[0]/2))
@@ -127,6 +138,19 @@ def reassemble2d(A: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     pt2 = pt2.reshape(N_, N_)
 
     return pt1, pt2
+
+
+def reassemble3d(A: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Undo flatten"""
+    N_ = int(np.cbrt(A.shape[0]/3))
+
+    pt1, pt2, pt3 = np.split(A, 3)
+
+    pt1 = pt1.reshape(N_, N_, N_)
+    pt2 = pt2.reshape(N_, N_, N_)
+    pt3 = pt3.reshape(N_, N_, N_)
+
+    return pt1, pt2, pt3
 
 
 def main():
