@@ -52,27 +52,6 @@ def atoms_to_array(atoms: List[Nucleus]) -> np.array:
     return result
 
 
-def schrod(E: float, V: Callable, r: Tuple[float, float], psi):
-    ψ, φ = psi
-    ψ_p = φ
-    φ_p = 2 * m_e / ħ ** 2 * (V(r) - E) * ψ
-
-    return ψ_p, φ_p
-
-
-def elec(E: float, V: Callable, ψ0: float, ψ_p0: float):
-    """
-    Calculate the wave function for electrons in an arbitrary potential, at a single snapshot
-    in time.
-    """
-    # todo: Currently does not include elec-elec interactions.
-
-    x_span = (-10, 10)
-
-    rhs = partial(schrod, E, V)
-    return solve_ivp(rhs, x_span, (ψ0, ψ_p0), t_eval=np.linspace(x_span[0], x_span[1], 10000))
-
-
 def nuc_potential(nuclei: Iterable[Nucleus], sx: float, sy: float) -> float:
     # In 1d, we have no angular momentum/centripetal potential: Only coulomb potential.
     result = 0
@@ -83,42 +62,55 @@ def nuc_potential(nuclei: Iterable[Nucleus], sx: float, sy: float) -> float:
     return result
 
 
-def h_static(ψ0, ψ_p0, E: float):
-    """A time-independent simulation of the electron cloud surrounding a hydrogen atom"""
-    V_elec = partial(nuc_potential, [Nucleus(1, 0, 0, 0, 0, 0)])
-    return elec(E, V_elec, ψ0, ψ_p0)
+def ti_schrod(E: float, V: Callable, r: Tuple[float, float], psi):
+    ψ, φ = psi
+    ψ_p = φ
+    φ_p = 2 * m_e / ħ ** 2 * (V(r) - E) * ψ
+
+    return ψ_p, φ_p
 
 
-def calc_hydrogen_static():
+def nuc_elec(E: float, V: Callable, ψ0: float, ψ_p0: float, x_span: Tuple[float, float]):
+    """
+    Calculate the wave function for electrons in an arbitrary potential, at a single snapshot
+    in time.
+    """
+
+    rhs = partial(ti_schrod, E, V)
+    return solve_ivp(rhs, x_span, (ψ0, ψ_p0), t_eval=np.linspace(x_span[0], x_span[1], 10000))
+
+
+def h_static(E: float):
     # todo: Try this - use the same idea as 1d, but mark all points on a radius.
     ψ0 = 0
     ψ_p0 = 1
 
     E = -.5
 
+    x_span = (-40, .0000001)
+
+    V_elec = partial(nuc_potential, [Nucleus(1, 0, 0, 0, 0, 0)])
+
+    soln = nuc_elec(E, V_elec, ψ0, ψ_p0, x_span)
+
     soln = h_static(ψ0, ψ_p0, E)
 
     return soln
 
 
-def calc_h_static_eig():
-    D = op.diff_op()
-    D2 = D @ D
+def plot_h_static():
+    n = 1
+    E = -2/(n+1)**2
 
-    E = -1/2
-    N = 50
-    x = np.linspace(N) - 25
+    # E = -.2543
 
-    V = nuc_potential([Nucleus(1, 0, 0, 0)], x)
+    x, ψ = h_static(E)
 
-    return 1/(2*E*V) * (D2 @ x)
-
-
-def plot_hydrogen_static():
-    # soln = calc_hydrogen_static()
-    soln = calc_hydrogen_static()
-
-    plt.plot(soln.t, soln.y[0])
+    fig, ax = plt.subplots()
+    ax.plot(x, ψ)
+    ax.plot(x, np.conj(ψ) * ψ)
+    ax.grid(True)
+    plt.xlim(-10, 10)
     plt.show()
 
 
@@ -136,6 +128,14 @@ def electron_potential(soln, n_electrons, sx: float, xy: float) -> float:
     return result
 
 
-if __name__ == "__main__":
-    plot_hydrogen_static()
-
+# def calc_h_static_eig():
+#     D = op.diff_op()
+#     D2 = D @ D
+#
+#     E = -1/2
+#     N = 50
+#     x = np.linspace(N) - 25
+#
+#     V = nuc_potential([Nucleus(1, 0, 0, 0)], x)
+#
+#     return 1/(2*E*V) * (D2 @ x)

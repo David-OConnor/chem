@@ -6,8 +6,9 @@ author = "David O'Connor"
 
 [tool.pyflow.scripts]
 h1 = "prototype1d:plot_h_static"
-h1e = "prototype1d:plot_h_static_evolve"
-h2 = "prototype2d:plot_hydrogen_static"
+h1e = "prototype1d:plot_h_evolve"
+h1de = "prototype1d:plot_h_evolve_de"
+h2 = "prototype2d:plot_h_static"
 h3 = "prototype1d:plot_h_sph"
 op = "op:main"
 

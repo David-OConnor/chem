@@ -81,6 +81,7 @@ def asarray(a, dtype=None, order=None):
     >>> np.asanyarray(a) is a
     True
 
+
     """
     return array(a, dtype, copy=False, order=order)
 

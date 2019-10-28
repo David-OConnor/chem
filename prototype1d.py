@@ -7,6 +7,7 @@ from typing import List, Iterable, Callable, Tuple
 import numpy as np
 from numpy import exp, sqrt
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 from scipy.integrate import solve_ivp, simps
 
 from consts import *
@@ -87,56 +88,40 @@ def ti_schrod(E: float, V: Callable, x: float, y):
     return ψ_p, φ_p
 
 
-def elec(E: float, V: Callable, ψ0: float, ψ_p0: float, x_span: Tuple[float, float]):
+def nuc_elec(E: float, V: Callable, ψ0: float, ψ_p0: float, x_span: Tuple[float, float]):
     """
     Calculate the wave function for electrons in an arbitrary potential, at a single snapshot
     in time.
     """
-
 
     rhs = partial(ti_schrod, E, V)
     return solve_ivp(rhs, x_span, (ψ0, ψ_p0), t_eval=np.linspace(x_span[0], x_span[1], 10000))
 
 
 def h_static(E: float) -> Tuple[np.ndarray, np.ndarray]:
-    ψ0 = 0
-    ψ_p0 = -.0001
-    x_span = (-40, 0.0001)
+    ψ0 = .2
+    ψ_p0 = 0
 
+    # ψ0 = 1
+    # ψ_p0 = 0
+
+    x_span = (-40, .0000001)
+    # x_span = (-40, 10)
+
+    # V_elec = partial(nuc_potential, [Nucleus(1, 0, 0, 0), Nucleus(1, 0, 3, 0)])
     V_elec = partial(nuc_potential, [Nucleus(1, 0, 0, 0)])
 
     # Left and right of the x=0 coulomb singularity. Assume odd solution around x=0.
-    soln_orig = elec(E, V_elec, ψ0, ψ_p0, x_span)
+    soln_orig = nuc_elec(E, V_elec, ψ0, ψ_p0, x_span)
     soln_left = soln_orig.y[0]
     soln_right = np.flip(soln_left)
     soln = np.concatenate([soln_left, -soln_right])
-    t = np.concatenate([soln_orig.t, np.flip(-soln_orig.t)])
+    x = np.concatenate([soln_orig.t, np.flip(-soln_orig.t)])
 
-    norm = simps(np.conj(soln) * soln, x=t)
-    return t, soln/norm**.5
-
-
-def evolve(state: np.ndarray, t0: float, t: float, E: float) -> np.ndarray:
-    """e^(-itH/ħ)"""
-    # todo eig st basis?
-    # e^(i*E*t/ħ)
-    # Assume H doesn't depend on time?
-    # H w/power expansion instead of E ??
-    # print(exp(-i*(t - t0) * E / ħ))
-    return state * exp(-i*(t - t0) * E / ħ)
-
-
-def td_schrod(E: float, V: Callable, x: float, ψ: complex):
-    return E * ψ / (i*ħ)
-
-
-def evolve2(state: np.ndarray, t0: float, t: float, E: float):
-    """iħ*dψ/dt = Hψ"""
-    t_span = (-10, 10)
-    ψ0, ψ_p0 = 0, 1
-
-    rhs = partial(ti_schrod, E)
-    return solve_ivp(rhs, t_span, (ψ0, ψ_p0), t_eval=np.linspace(t_span[0], t_span[1], 10000))
+    norm = simps(np.conj(soln) * soln, x=x)
+    return x, soln/norm**.5
+    # norm = simps(np.conj(soln_orig.y[0]) * soln_orig.y[0], x=soln_orig.t)
+    # return soln_orig.t, soln_orig.y[0]/norm**.5
 
 
 def plot_h_static():
@@ -147,44 +132,139 @@ def plot_h_static():
     n = 1
     E = -2/(n+1)**2
 
-    t, ψ = h_static(E)
+    # E = -.44194
+
+    x, ψ = h_static(E)
 
     fig, ax = plt.subplots()
-    ax.plot(t, ψ)
-    ax.plot(t, np.conj(ψ) * ψ)
+    ax.plot(x, ψ)
+    ax.plot(x, np.conj(ψ) * ψ)
+    ax.grid(True)
+    plt.xlim(-10, 10)
+    plt.show()
 
-    integ = simps(np.conj(ψ) * ψ, x=t)
-    # print("Norm sq: ", integ)
+
+"""Time-evolution approaches:
+- Break into basis of energy eigenstates (n = 1, 3 etc); evolve using (exp(-i*(t - t0) * E / ħ))
+- Just solve the PDE of x and time (Challenge: Solving PDEs)
+- Solve time as ODE after initially solving the spatial ode??
+"""
+
+
+def evolve_basis(state: np.ndarray, dt: float, E: float) -> np.ndarray:
+    """e^(-itH/ħ), using an energy eigenbasis as the state."""
+    return state * exp(-i * dt * E / ħ)
+
+
+def td_schrod(E: float, t: float, 𝚿: complex):
+    return E * 𝚿 / (i * ħ)
+
+
+def evolve_de(x: np.ndarray, ψ0: np.ndarray, dt: float, E: float) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    In this approach, we solve the full PDE of x and t: iħ*dψ/dt = Hψ.
+    We use the method of lines to discretize x, then solve as an ODE over t.
+
+    iħ * d𝚿/dt = -1/2 * d^2𝚿/dx^2 + V𝚿
+    d^2𝚿/dx^2 = (𝚿(xi+1, t) - 2𝚿(xi, t) + 𝚿(xi-1, t)) / Δx^2
+    iħ * d𝚿/dt = -1/2 (𝚿_i+1(t) - 2𝚿_i(t) + 𝚿_i-1(t)) / Δx^2 + V𝚿
+
+    """
+    t_span = (0, 10)
+
+    N = 100
+
+    result = np.empty([x.size, N])
+    for j in range(x.size):
+        𝚿0, d𝚿_dt = ψ0[j], 1  # todo: What should the initial d𝚿_dt be?
+
+        rhs = partial(td_schrod, E)
+
+        soln = solve_ivp(rhs, t_span, (𝚿0, d𝚿_dt), t_eval=np.linspace(t_span[0], t_span[1], N))
+        result[j] = soln.y[0]
+    # todo: Can we assume t is invariant across the integration?
+    return soln.t, result
+
+
+def plot_h_evolve_de():
+    dt = 1
+    n = 1
+    E1= -2 / (n + 1) ** 2
+    E2 = -2 / (3 + 1) ** 2
+
+    x, ψ_0 = sqrt(2)/2 * h_static(E1) + sqrt(2)/2 * h_static(E2)  # A wall boundary condition, across all x, for t=0
+
+    t, soln = evolve_de(x, ψ_0, dt, E)
+    breakpoint()
+
+    fig, ax = plt.subplots()
+
+    for t in soln:
+        ax.plot()
+
+
+    ax.grid(True)
+    plt.show()
+
+
+def plot_h_evolve():
+    dt = 10
+    ev = lambda E: exp(-i * dt * E / ħ)
+
+    n = 1
+    E1 = -2 / (n + 1) ** 2
+    E2 = -2 / (3 + 1) ** 2
+    E3 = -2 / (5 + 1) ** 2
+
+    # Eigenfunctions as basis
+    x, ψ1 = h_static(E1)
+    _, ψ2 = h_static(E2)
+    # _, ψ3 = h_static(E3)
+
+    # state = [(sqrt(3)/3, E1), (sqrt(3)/3, E2), (sqrt(3)/3, E3)]
+    state = [(sqrt(2)/2, E1), (sqrt(2)/2, E2)]
+
+    fig, ax = plt.subplots()
+
+    # fig = plt.figure()
+    # ax = fig.add_subplot(111, projection='3d')
+
+    for j in range(1):
+        # Evolved here are the coefficients
+        evolved1 = state[0][0] * ev(state[0][1])
+        evolved2 = state[1][0] * ev(state[1][1])
+        # evolved3 = state[2][0] * ev(state[2][1])
+
+        # state = [(evolved1, state[0][1]), (evolved2, state[1][1]), (evolved3, state[2][1])]
+        state = [(evolved1, state[0][1]), (evolved2, state[1][1])]
+
+        # ψ = state[0][0] * ψ1 + state[1][0] * ψ2 + state[2][0] * ψ3
+        ψ = state[0][0] * ψ1 + state[1][0] * ψ2
+        # print(state)
+        # print(np.abs(state[0][0]), np.abs(state[1][0]))
+        # ax.plot(x, ψ)
+        ax.plot(x, np.conj(ψ) * ψ)
+
+    # (x, y) = np.meshgrid(np.arange(matrix.shape[0]), np.arange(matrix.shape[1]))
+
+    # Axes3D.plot_surface(x, y, Z)
 
     ax.grid(True)
     plt.xlim(-10, 10)
     plt.show()
 
 
-def plot_h_static_evolve():
-    dt = 0.01
-
-    n = 1
-    E = -2 / (n + 1) ** 2 # must match in calc_hydrogen static
-
-    soln = h_static(E)
-    for i in range(1):
-        evolved = evolve(soln.y[0]**2, 0, dt, E)
-        plt.plot(soln.t, evolved)
-
-    plt.show()
-
-    # def calc_h_static_eig():
-    #     D = op.diff_op()
-    #     D2 = D @ D
-    #
-    #     E = -1/2
-    #     N = 50
-    #     x = np.linspace(N) - 25
-    #
-    #     V = nuc_potential([Nucleus(1, 0, 0, 0)], x)
-    #
-    #     return 1/(2*E*V) * (D2 @ x)
+# def calc_h_static_eig():
+#     D = op.diff_op()
+#     D2 = D @ D
+#
+#     E = -1/2
+#     N = 50
+#     x = np.linspace(N) - 25
+#
+#     V = nuc_potential([Nucleus(1, 0, 0, 0)], x)
+#
+#     return 1/(2*E*V) * (D2 @ x)
 
 
 def electron_potential(soln, n_electrons, sx: float) -> float:
@@ -212,7 +292,7 @@ def rhs_nbody(atoms: Iterable[Nucleus], t: float, y: np.array):
 
     # Chicken-egg scenario with calculating electric potential, so use the previous
     # iteration's field.
-    soln_elec = elec(E, V_prev)
+    soln_elec = nuc_elec(E, V_prev)
 
     # todo wrong! y[t] is y at diff posit, not time.
     E = i * ħ * soln_elec.y[t] - soln_elec.y[t-1]
@@ -271,8 +351,4 @@ def nbody():
 
 
 if __name__ == "__main__":
-    plot_hydrogen_static()
-
-# plot_ics()
-
-# find_ψ_p0()
+    plot_h_static()
