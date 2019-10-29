@@ -80,7 +80,7 @@ def nuc_potential(nuclei: Iterable[Nucleus], sx: float) -> float:
     return result
 
 
-def ti_schrod(E: float, V: Callable, x: float, y):
+def ti_schrod(E: float, V: Callable, x: float, y: Tuple[complex, complex]) -> Tuple[complex, complex]:
     ψ, φ = y
     ψ_p = φ
     φ_p = 2 * m_e / ħ ** 2 * (V(x) - E) * ψ
@@ -93,7 +93,6 @@ def nuc_elec(E: float, V: Callable, ψ0: float, ψ_p0: float, x_span: Tuple[floa
     Calculate the wave function for electrons in an arbitrary potential, at a single snapshot
     in time.
     """
-
     rhs = partial(ti_schrod, E, V)
     return solve_ivp(rhs, x_span, (ψ0, ψ_p0), t_eval=np.linspace(x_span[0], x_span[1], 10000))
 
@@ -156,14 +155,30 @@ def evolve_basis(state: np.ndarray, dt: float, E: float) -> np.ndarray:
     return state * exp(-i * dt * E / ħ)
 
 
-def td_schrod(E: float, t: float, 𝚿: complex):
-    return E * 𝚿 / (i * ħ)
+def td_schrod_t(d2ψ_dx2: complex, V: float, t: float, 𝚿: complex):
+    """
+    2 * m_e / ħ ** 2 * (V(x) - E) * ψ
+    Return d𝚿/dt
+    """
+    return (-ħ**2/(2*m_e) * d2ψ_dx2 + V * 𝚿) / (i*ħ)
 
 
-def evolve_de(x: np.ndarray, ψ0: np.ndarray, dt: float, E: float) -> Tuple[np.ndarray, np.ndarray]:
+def td_schrod_x(d𝚿_dt: complex, V: Callable, x: float, y: Tuple[complex, complex]) -> Tuple[complex, complex]:
+    """
+    This is similar to `ti_schrod`, but uses d𝚿_dt instead of E.
+    todo: Just use the same fn? Only diff is the i*ħ factor.
+    """
+    ψ, φ = y
+    ψ_p = φ
+    φ_p = 2 * m_e / ħ ** 2 * (V(x) - i*ħ*d𝚿_dt) * ψ
+
+    return ψ_p, φ_p
+
+
+def evolve_de(x: np.ndarray, ψ0: np.ndarray, dt: float, E: float) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     In this approach, we solve the full PDE of x and t: iħ*dψ/dt = Hψ.
-    We use the method of lines to discretize x, then solve as an ODE over t.
+    We use the Method of Lines to discretize x, then solve as an ODE over t.
 
     iħ * d𝚿/dt = -1/2 * d^2𝚿/dx^2 + V𝚿
     d^2𝚿/dx^2 = (𝚿(xi+1, t) - 2𝚿(xi, t) + 𝚿(xi-1, t)) / Δx^2
@@ -174,16 +189,29 @@ def evolve_de(x: np.ndarray, ψ0: np.ndarray, dt: float, E: float) -> Tuple[np.n
 
     N = 100
 
-    result = np.empty([x.size, N])
+    result = np.empty([N, x.size])
+    result[0] = ψ0
+
+    t = np.arange(0, x.size)  # todo
+
+    # Iterate over each x value, to find its corresponding one one time-step later.
     for j in range(x.size):
-        𝚿0, d𝚿_dt = ψ0[j], 1  # todo: What should the initial d𝚿_dt be?
+        x_ = x[j]
+        ψ = ψ0[j]
+        x_span = (-40, .0000001) # todo sync with other one
 
-        rhs = partial(td_schrod, E)
+        # Calculate d𝚿/dt for each value of x.
+        d2ψ_dx2 = np.diff(np.diff(ψ))  # todo: Check the offset imposed by d2ing!
+        V_x = nuc_potential([Nucleus(1, 0, 0, 0)], x_)
 
-        soln = solve_ivp(rhs, t_span, (𝚿0, d𝚿_dt), t_eval=np.linspace(t_span[0], t_span[1], N))
-        result[j] = soln.y[0]
+        d𝚿_dt = td_schrod_t(d2ψ_dx2[j], V_x, 0, ψ[j])
+
+        rhs = partial(td_schrod_x, d𝚿_dt)
+        ψ, _ = solve_ivp(rhs, x_span, (),  t_eval=np.linspace(x_span[0], x_span[1], 10000)).y
+
+        result[j] = ψ
     # todo: Can we assume t is invariant across the integration?
-    return soln.t, result
+    return x, t, result
 
 
 def plot_h_evolve_de():

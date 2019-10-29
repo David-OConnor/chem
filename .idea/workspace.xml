@@ -6,10 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="63843798-86fc-4cf6-9df5-0d52eff0dddc" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy/core/_asarray.py" beforeDir="false" afterPath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy/core/_asarray.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/prototype1d.py" beforeDir="false" afterPath="$PROJECT_DIR$/prototype1d.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/prototype2d.py" beforeDir="false" afterPath="$PROJECT_DIR$/prototype2d.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pyproject.toml" beforeDir="false" afterPath="$PROJECT_DIR$/pyproject.toml" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -262,7 +259,9 @@
       <workItem from="1572138823108" duration="12340000" />
       <workItem from="1572164899418" duration="7511000" />
       <workItem from="1572183328129" duration="1340000" />
-      <workItem from="1572209168433" duration="5124000" />
+      <workItem from="1572209168433" duration="9333000" />
+      <workItem from="1572248966979" duration="342000" />
+      <workItem from="1572329580152" duration="5354000" />
     </task>
     <servers />
   </component>
