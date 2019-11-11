@@ -57,7 +57,6 @@ from numpy import pi
 m_e = 1
 i = complex(0, 1)
 a_0 = 1
-from numpy import pi
 
 N = 50
 xmin = 0
@@ -87,11 +86,10 @@ def diff_op(N2: Optional[int]) -> np.ndarray:
     return (np.roll(np.diagflat(-part1), -1) + np.roll(np.diagflat(part1), 1)) / dx
 
 
-def diff_sq_op() -> np.ndarray:
+def diff_sq_op(N2: Optional[int]) -> np.ndarray:
+    N_ = N2 if N2 else N
     """A more direct variant that squaring the diff op."""
-    return (-2 * np.eye(N) + np.roll(np.eye(N), -1) + np.roll(np.eye(N), 1)) / dx
-
-
+    return (-2 * np.eye(N_) + np.roll(np.eye(N_), -1) + np.roll(np.eye(N_), 1)) / dx
 
 
 def hamiltonian(V: np.ndarray) -> np.ndarray:

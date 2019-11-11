@@ -13,13 +13,24 @@ h3 = "prototype1d:plot_h_sph"
 op = "op:main"
 
 [tool.pyflow.dependencies]
-ipython = "^7.5.0"
+ipython = { version = "^7.5.0", extras = ["qtconsole"] }
 matplotlib = "^3.1.0"
 numpy = "^1.16.4"
 scipy = "^1.3.0"
-toolz = "^0.9.0"
-pexpect = "^4.7.0"
 pyqt5 = "^5.13.0"
+qtconsole = "^4.5.5"
+
+# todo how to properfly install fenics?
+fenics = "^2019.1.0"
+fenics-ffc = "^2019.1.0"
+
+
+# for sfepy, which isn't on pypi. Pyflow currenlty
+sfepy = { path = "/home/david/Desktop/sfepy-wheel" }
+mayavi = { path = "/home/david/Desktop/mayavi-wheel" }
+configobj = "^5.0.6"  # Not specified by myavi's METADATA.
+
+
 
 [tool.pyflow.dev-dependencies]
 

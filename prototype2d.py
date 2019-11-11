@@ -13,11 +13,6 @@ from consts import *
 
 ATOM_ARR_LEN = 5
 
-# A global state var
-V_prev: Callable = lambda sx: 0
-
-import op
-
 
 @dataclass
 class Nucleus:
@@ -126,16 +121,3 @@ def electron_potential(soln, n_electrons, sx: float, xy: float) -> float:
         result += n_electrons * -e * (prob[i] / total_prob) / abs(soln.t[i] - sx)
 
     return result
-
-
-# def calc_h_static_eig():
-#     D = op.diff_op()
-#     D2 = D @ D
-#
-#     E = -1/2
-#     N = 50
-#     x = np.linspace(N) - 25
-#
-#     V = nuc_potential([Nucleus(1, 0, 0, 0)], x)
-#
-#     return 1/(2*E*V) * (D2 @ x)

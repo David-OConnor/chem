@@ -5,8 +5,68 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="63843798-86fc-4cf6-9df5-0d52eff0dddc" name="Default" comment="">
+      <change afterPath="$PROJECT_DIR$/1d_eig.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/1d_problem.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/f_schrod_2d_eig.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ft01_poisson.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/chem.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/chem.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy-1.17.2.dist-info/METADATA" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy-1.17.2.dist-info/RECORD" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy-1.17.2.dist-info/WHEEL" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy-1.17.2.dist-info/entry_points.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy-1.17.2.dist-info/top_level.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy/.libs/libopenblasp-r0-2ecf47d5.3.7.dev.so" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy/core/_asarray.py" beforeDir="false" afterPath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy/core/_asarray.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy/core/_multiarray_umath.cpython-37m-x86_64-linux-gnu.so" beforeDir="false" afterPath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy/core/_multiarray_umath.cpython-37m-x86_64-linux-gnu.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy/core/include/numpy/ndarrayobject.h" beforeDir="false" afterPath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy/core/include/numpy/ndarrayobject.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy/core/lib/libnpymath.a" beforeDir="false" afterPath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy/core/lib/libnpymath.a" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy/core/tests/test_multiarray.py" beforeDir="false" afterPath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy/core/tests/test_multiarray.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy/fft/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy/fft/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy/fft/info.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy/fft/pocketfft.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy/fft/pocketfft_internal.cpython-37m-x86_64-linux-gnu.so" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy/fft/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy/fft/setup.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy/linalg/_umath_linalg.cpython-37m-x86_64-linux-gnu.so" beforeDir="false" afterPath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy/linalg/_umath_linalg.cpython-37m-x86_64-linux-gnu.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy/linalg/lapack_lite.cpython-37m-x86_64-linux-gnu.so" beforeDir="false" afterPath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy/linalg/lapack_lite.cpython-37m-x86_64-linux-gnu.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy/random/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy/random/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy/random/bit_generator.cpython-37m-x86_64-linux-gnu.so" beforeDir="false" afterPath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy/random/bit_generator.cpython-37m-x86_64-linux-gnu.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy/random/bounded_integers.cpython-37m-x86_64-linux-gnu.so" beforeDir="false" afterPath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy/random/bounded_integers.cpython-37m-x86_64-linux-gnu.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy/random/entropy.cpython-37m-x86_64-linux-gnu.so" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy/random/generator.cpython-37m-x86_64-linux-gnu.so" beforeDir="false" afterPath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy/random/generator.cpython-37m-x86_64-linux-gnu.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy/random/mt19937.cpython-37m-x86_64-linux-gnu.so" beforeDir="false" afterPath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy/random/mt19937.cpython-37m-x86_64-linux-gnu.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy/random/mtrand.cpython-37m-x86_64-linux-gnu.so" beforeDir="false" afterPath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy/random/mtrand.cpython-37m-x86_64-linux-gnu.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy/random/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy/random/setup.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy/random/tests/test_randomstate_regression.py" beforeDir="false" afterPath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy/random/tests/test_randomstate_regression.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy/random/tests/test_smoke.py" beforeDir="false" afterPath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy/random/tests/test_smoke.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy/version.py" beforeDir="false" afterPath="$PROJECT_DIR$/__pypackages__/3.7/lib/numpy/version.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/pkg_resources/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/__pypackages__/3.7/lib/pkg_resources/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/setuptools-41.2.0.dist-info/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/setuptools-41.2.0.dist-info/METADATA" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/setuptools-41.2.0.dist-info/RECORD" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/setuptools-41.2.0.dist-info/WHEEL" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/setuptools-41.2.0.dist-info/dependency_links.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/setuptools-41.2.0.dist-info/entry_points.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/setuptools-41.2.0.dist-info/top_level.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/setuptools-41.2.0.dist-info/zip-safe" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/setuptools/command/bdist_egg.py" beforeDir="false" afterPath="$PROJECT_DIR$/__pypackages__/3.7/lib/setuptools/command/bdist_egg.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/setuptools/command/easy_install.py" beforeDir="false" afterPath="$PROJECT_DIR$/__pypackages__/3.7/lib/setuptools/command/easy_install.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/setuptools/command/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/__pypackages__/3.7/lib/setuptools/command/test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/setuptools/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/__pypackages__/3.7/lib/setuptools/config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/setuptools/depends.py" beforeDir="false" afterPath="$PROJECT_DIR$/__pypackages__/3.7/lib/setuptools/depends.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/setuptools/dist.py" beforeDir="false" afterPath="$PROJECT_DIR$/__pypackages__/3.7/lib/setuptools/dist.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/setuptools/extern/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/__pypackages__/3.7/lib/setuptools/extern/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/setuptools/msvc.py" beforeDir="false" afterPath="$PROJECT_DIR$/__pypackages__/3.7/lib/setuptools/msvc.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/setuptools/package_index.py" beforeDir="false" afterPath="$PROJECT_DIR$/__pypackages__/3.7/lib/setuptools/package_index.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__pypackages__/3.7/lib/setuptools/py27compat.py" beforeDir="false" afterPath="$PROJECT_DIR$/__pypackages__/3.7/lib/setuptools/py27compat.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/op.py" beforeDir="false" afterPath="$PROJECT_DIR$/op.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/prototype1d.py" beforeDir="false" afterPath="$PROJECT_DIR$/prototype1d.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/prototype2d.py" beforeDir="false" afterPath="$PROJECT_DIR$/prototype2d.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/prototype_radial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pyflow.lock" beforeDir="false" afterPath="$PROJECT_DIR$/pyflow.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pyproject.toml" beforeDir="false" afterPath="$PROJECT_DIR$/pyproject.toml" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -48,7 +108,7 @@
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/src" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -61,12 +121,13 @@
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/src" />
-      <recent name="C:\Users\david\code\chem" />
-    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/src" />
+      <recent name="C:\Users\david\code\chem" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -261,7 +322,33 @@
       <workItem from="1572183328129" duration="1340000" />
       <workItem from="1572209168433" duration="9333000" />
       <workItem from="1572248966979" duration="342000" />
-      <workItem from="1572329580152" duration="5354000" />
+      <workItem from="1572329580152" duration="6692000" />
+      <workItem from="1572401666286" duration="2106000" />
+      <workItem from="1572440384379" duration="1206000" />
+      <workItem from="1572491676079" duration="3039000" />
+      <workItem from="1572503465621" duration="2123000" />
+      <workItem from="1572586808677" duration="1877000" />
+      <workItem from="1572595742634" duration="1201000" />
+      <workItem from="1572600407433" duration="2519000" />
+      <workItem from="1572694903176" duration="4490000" />
+      <workItem from="1572745971833" duration="16536000" />
+      <workItem from="1572768527355" duration="607000" />
+      <workItem from="1572770798978" duration="6210000" />
+      <workItem from="1572812711576" duration="746000" />
+      <workItem from="1572839176194" duration="599000" />
+      <workItem from="1572867427321" duration="1090000" />
+      <workItem from="1572921654378" duration="621000" />
+      <workItem from="1572924719357" duration="599000" />
+      <workItem from="1572939902151" duration="6517000" />
+      <workItem from="1573012418360" duration="1708000" />
+      <workItem from="1573019891042" duration="13200000" />
+      <workItem from="1573093479393" duration="1921000" />
+      <workItem from="1573109499505" duration="9076000" />
+      <workItem from="1573188595078" duration="599000" />
+      <workItem from="1573283249935" duration="1431000" />
+      <workItem from="1573301920661" duration="5362000" />
+      <workItem from="1573355151321" duration="4215000" />
+      <workItem from="1573469392003" duration="2826000" />
     </task>
     <servers />
   </component>

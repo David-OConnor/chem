@@ -1,0 +1,8 @@
+/tmp/tmplghli4xx/dolfin_expression_2b96177bcbd6ab207dcad2d48ddf1da7.cpp: In member function 'virtual void dolfin::dolfin_expression_2b96177bcbd6ab207dcad2d48ddf1da7::eval(Eigen::Ref<Eigen::Matrix<double, -1, 1> >, Eigen::Ref<const Eigen::Matrix<double, -1, 1> >) const':
+/tmp/tmplghli4xx/dolfin_expression_2b96177bcbd6ab207dcad2d48ddf1da7.cpp:62:33: error: 'psi' was not declared in this scope
+           values[0] = (0 - E) * psi;
+                                 ^~~
+/tmp/tmplghli4xx/dolfin_expression_2b96177bcbd6ab207dcad2d48ddf1da7.cpp:62:33: note: suggested alternative: 'pi'
+           values[0] = (0 - E) * psi;
+                                 ^~~
+                                 pi
