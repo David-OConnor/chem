@@ -6,9 +6,13 @@
       <sourceFolder url="file://$MODULE_DIR$/examples" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/tests" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/benches" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/../chem\examples" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../chem\tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/../chem\benches" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
+      <excludeFolder url="file://$MODULE_DIR$/../chem\target" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.7 (chem) (2)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.7 (chem)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="PyDocumentationSettings">

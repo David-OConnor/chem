@@ -1,0 +1,4 @@
+/tmp/tmpf_m22k18/dolfin_expression_429912f05c24a61ffb907e8db06018b6.cpp: In member function 'virtual void dolfin::dolfin_expression_429912f05c24a61ffb907e8db06018b6::eval(Eigen::Ref<Eigen::Matrix<double, -1, 1> >, Eigen::Ref<const Eigen::Matrix<double, -1, 1> >) const':
+/tmp/tmpf_m22k18/dolfin_expression_429912f05c24a61ffb907e8db06018b6.cpp:62:68: error: expected primary-expression before ';' token
+           values[0] = abs(x[0]) < eps || abs(x[0]) - 1 < eps ? 0 : ;
+                                                                    ^

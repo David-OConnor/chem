@@ -12,7 +12,7 @@ workspace.xml
 
 
 # Sfepy
-simple.py
+sfepy/simple.py
 postproc.py
 *.vtk
 
