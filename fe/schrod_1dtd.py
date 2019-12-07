@@ -1,6 +1,9 @@
 from fenics import *
 import matplotlib.pyplot as plt
 
+import matplotlib
+matplotlib.use('TkAgg')  # For WSL
+
 # Create mesh and define function space
 mesh = UnitSquareMesh(8, 8)
 V = FunctionSpace(mesh, 'P', 1)

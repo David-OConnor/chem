@@ -3,11 +3,9 @@ from dataclasses import dataclass
 from functools import partial
 from typing import List, Iterable, Callable, Tuple
 
-import numpy as np
 from numpy import sqrt
-from math import factorial
 import matplotlib.pyplot as plt
-from scipy.integrate import solve_ivp, simps
+from scipy.integrate import solve_ivp
 
 from consts import *
 

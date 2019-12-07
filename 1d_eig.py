@@ -4,6 +4,9 @@ import numpy as np
 from scripts import p1d
 import op
 
+import matplotlib
+# matplotlib.use('qt5')  # For WSL
+
 N = 10
 
 

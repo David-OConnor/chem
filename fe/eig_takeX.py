@@ -1,18 +1,17 @@
+#Feras Aldahlawi
+#Schrodinger equation solver using fenics
+
 from fenics import *
 from mshr import *
 import matplotlib.pyplot as plt
+import numpy as np
 
 import matplotlib
 matplotlib.use('TkAgg')  # For WSL
 
-
-# Create mesh and define function space
-domain = Circle(Point(0, 0), 1)
-mesh = generate_mesh(domain, 64)
-
-V = FunctionSpace(mesh, 'P', 1)
-
-eps = 1e-14
+#define mesh and function space
+mesh = UnitSquareMesh(20,20)
+V = FunctionSpace(mesh, 'Lagrange', 3)
 
 #build essential boundary conditions
 def u0_boundary(x, on_boundary):
@@ -24,12 +23,12 @@ bc = DirichletBC(V,Constant(0.0) , u0_boundary)
 u = TrialFunction(V)
 v = TestFunction(V)
 
-# Pot = Expression('0.0')
-E = -1/2
-Pot = Expression('-1 / (sqrt(pow(x[0], 2) + pow(x[1], 2)))', degree=2)
+
+Pot = Expression('0.0', degree=1)
 
 #define problem
-a = (inner(grad(u), grad(v)) + Pot*u*v)*dx
+a = (inner(grad(u), grad(v)) \
+     + Pot*u*v)*dx
 m = u*v*dx
 
 A = PETScMatrix()
@@ -58,4 +57,5 @@ for i in range(0,5):
     #assign eigenvector to function
     u.vector()[:] = rx
 
-    plot(u, interactive=True)
+    plot(u,interactive=True)
+    plt.show()

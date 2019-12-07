@@ -1,0 +1,10 @@
+/tmp/tmp73qfqv_g/dolfin_expression_effb585020d9e700a2404b455975e341.cpp:65:35: error: stray '\317' in program
+           values[0] = (Pot - E) * ψ;
+                                   ^
+/tmp/tmp73qfqv_g/dolfin_expression_effb585020d9e700a2404b455975e341.cpp:65:36: error: stray '\210' in program
+           values[0] = (Pot - E) * ψ;
+                                    ^
+/tmp/tmp73qfqv_g/dolfin_expression_effb585020d9e700a2404b455975e341.cpp: In member function 'virtual void dolfin::dolfin_expression_effb585020d9e700a2404b455975e341::eval(Eigen::Ref<Eigen::Matrix<double, -1, 1> >, Eigen::Ref<const Eigen::Matrix<double, -1, 1> >) const':
+/tmp/tmp73qfqv_g/dolfin_expression_effb585020d9e700a2404b455975e341.cpp:65:37: error: expected primary-expression before ';' token
+           values[0] = (Pot - E) * ψ;
+                                     ^

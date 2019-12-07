@@ -6,7 +6,6 @@ from dataclasses import dataclass
 from functools import partial
 from typing import List, Iterable, Callable
 
-import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
 

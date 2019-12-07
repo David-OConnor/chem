@@ -4,7 +4,6 @@ from dataclasses import dataclass
 from functools import partial
 from typing import List, Iterable, Callable, Tuple
 
-import numpy as np
 from numpy import exp, sqrt
 import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp, simps
@@ -148,7 +147,7 @@ def plot_h_static():
     # ψ_p0 should be 0 for continuity across the origin.
     # E should be a whittaker energy, ie -1/2, -2/9, -1/8, -.08 etc
     # Only odd states (n = 1, 3, 5 etc) correspond to 3d H atom.
-    n = 3
+    n = 1
     E = -2/(n+1)**2
 
     x, ψ = h_static(E)
