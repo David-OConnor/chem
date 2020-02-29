@@ -1,6 +1,6 @@
 [tool.pyflow]
 name = "Chem"
-py_version = "3.7"
+py_version = "3.8"
 version = "0.0.1"
 author = "David O'Connor"
 
@@ -29,6 +29,7 @@ qtconsole = "^4.5.5"
 #sfepy = { path = "/home/david/Desktop/sfepy-wheel" }
 #mayavi = { path = "/home/david/Desktop/mayavi-wheel" }
 configobj = "^5.0.6"  # Not specified by myavi's METADATA.
+plotly = "^4.5.2"
 
 
 

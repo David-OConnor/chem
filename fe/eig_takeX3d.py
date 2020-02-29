@@ -10,14 +10,14 @@ import matplotlib
 matplotlib.use('TkAgg')  # For WSL
 
 #define mesh and function space
-mesh = UnitSquareMesh(20, 20)
+mesh = UnitCubeMesh(20, 20, 20)
 V = FunctionSpace(mesh, 'Lagrange', 3)
 
 #build essential boundary conditions
 def u0_boundary(x, on_boundary):
     return on_boundary
 
-bc = DirichletBC(V, Constant(0.0), u0_boundary)
+bc = DirichletBC(V,Constant(0.0) , u0_boundary)
 
 #define functions
 u = TrialFunction(V)
@@ -56,9 +56,7 @@ for i in range(0, 5):
     #assign eigenvector to function
     u.vector()[:] = rx
 
-    print(u)
-    # breakpoint()
-    # break
+    breakpoint()
 
     plot(u, interactive=True)
     plt.show()
