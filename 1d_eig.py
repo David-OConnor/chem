@@ -15,7 +15,7 @@ def main():
 
     D2 = op.diff_op_sq(N)
 
-    V_fn = partial(p1d.nuc_potential, [p1d.Nucleus(1, 0, 0, 0)])
+    V_fn = partial(p1d.nuc_pot, [p1d.Nucleus(1, 0, 0, 0)])
 
     V_vec = np.empty(N)
     for j, x_ in enumerate(x):

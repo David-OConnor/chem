@@ -2,6 +2,11 @@ from dataclasses import dataclass
 from typing import List, Tuple
 
 import numpy as np
+from numpy import pi as π
+from math import factorial
+import matplotlib.pyplot as plt
+
+i = complex(0, 1)
 
 
 @dataclass

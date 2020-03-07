@@ -5,16 +5,25 @@
 - Just solve the PDE of x and time (Challenge: Solving PDEs)
 - Solve time as ODE after initially solving the spatial ode??
 """
+from dataclasses import dataclass
 from functools import partial
-from typing import Tuple, List
+from typing import Tuple, List, Callable
 
 import matplotlib.pyplot as plt
 
 import numpy as np
 from scipy.integrate import simps
 
-from .p1d import Nucleus, nuc_potential, nuc_elec
+from .p1d import Nucleus, nuc_pot, solve
 
+ATOM_ARR_LEN = 5
+
+
+@dataclass
+class Electron:
+    # ψ: List[float]
+    ψ: Callable[[float], float]
+    spin: bool  # True for up
 
 def atoms_to_array(atoms: List[Nucleus]) -> np.array:
     # Convert atoms to an array we'll intergrate.
@@ -33,9 +42,9 @@ def h_static_pure(E: float) -> Tuple[np.ndarray, np.ndarray]:
 
     x_span = (-40, .0000001)
 
-    V_elec = partial(nuc_potential, [Nucleus(1, 0, 0, 0)])
+    V_elec = partial(nuc_pot, [Nucleus(1, 0, 0, 0)])
 
-    soln = nuc_elec(E, V_elec, ψ0, ψ_p0, x_span)
+    soln = solve(E, V_elec, ψ0, ψ_p0, x_span)
 
     x, soln = soln.t, soln.y[0]
 
@@ -88,7 +97,7 @@ def evolve_de(x: np.ndarray, ψ0: np.ndarray, dt: float) -> Tuple[np.ndarray, np
     t = np.arange(0, x.size)  # todo
     ψ = ψ0
     x_span = (-40, .0000001)  # todo sync with other one
-    V = partial(nuc_potential, [Nucleus(1, 0, 0, 0)])
+    V = partial(nuc_pot, [Nucleus(1, 0, 0, 0)])
 
     # Iterate over each x value, to find its corresponding one one time-step later.
     # todo: For now, this is euler-esque, stepping over t.
@@ -217,7 +226,7 @@ def rhs_nbody(atoms: Iterable[Nucleus], t: float, y: np.array):
 
     # Chicken-egg scenario with calculating electric potential, so use the previous
     # iteration's field.
-    soln_elec = nuc_elec(E, V_prev)
+    soln_elec = solve(E, V_prev)
 
     # todo wrong! y[t] is y at diff posit, not time.
     E = i * ħ * soln_elec.y[t] - soln_elec.y[t-1]
@@ -234,7 +243,7 @@ def rhs_nbody(atoms: Iterable[Nucleus], t: float, y: np.array):
     for j in range(y_flat.shape[0]):
         mass, n_prot, n_elec, sx, dx_dt = y_flat[j]
 
-        V_nuc = nuc_potential(atoms2, sx)
+        V_nuc = nuc_pot(atoms2, sx)
         V_elec = electron_potential(soln_elec, total_n_elec, sx)
         force = (V_nuc + V_elec) * (n_prot * e)
 
