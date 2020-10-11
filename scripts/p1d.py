@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from scipy.integrate import solve_ivp, simps
+from scipy.fft import fft
 
 from consts import *
 
@@ -10,16 +11,18 @@ from numpy import exp, sqrt
 
 import numpy as np
 
+τ = 2 * np.pi
+
 
 import matplotlib.pyplot as plt
 import matplotlib
-matplotlib.use('Qt5Agg')
+
+matplotlib.use("Qt5Agg")
 # import seaborn as sns
 # import plotly
 # import plotly.graph_objects as go
 
-
-
+from series import Fourier
 
 # A global state var
 V_prev: Callable = lambda sx: 0
@@ -63,25 +66,30 @@ def nuc_pot(nuclei: Iterable[Nucleus], sx: float) -> float:
     result = 0
     for nuclei in nuclei:
         # Coulomb potential
-        result -= e**2 / abs(nuclei.sx - sx)
+        result -= e / abs(nuclei.sx - sx)
 
     return result
+
 
 ###
 
 
-def ti_schrod_rhs_new(E: float, V: Callable, x: complex, y: Tuple[complex, complex]) -> Tuple[complex, complex]:
+def ti_schrod_rhs_new(
+    E: float, V: Callable, x: complex, y: Tuple[complex, complex]
+) -> Tuple[complex, complex]:
     """
     d²ψ/dx² = 2m/ħ² * (V(x) - E)ψ
     """
     ψ, φ = y
     ψ_p = φ
-    φ_p = 2 * m_e / ħ**2 * (V(x) - E) * ψ
+    φ_p = 2 * m_e / ħ ** 2 * (V(x) - E) * ψ
 
     return ψ_p, φ_p
 
 
-def solve_new(E: float, V: Callable, ψ0: complex, ψ_p0: complex, x_span: Tuple[complex, complex]):
+def solve_new(
+    E: float, V: Callable, ψ0: complex, ψ_p0: complex, x_span: Tuple[complex, complex]
+):
     """
     Calculate the wave function for electrons in an arbitrary potential, at a single snapshot
     in time.
@@ -95,7 +103,9 @@ def solve_new(E: float, V: Callable, ψ0: complex, ψ_p0: complex, x_span: Tuple
     # todo: Some type of self-consistent procedure?
 
     rhs = partial(ti_schrod_rhs_new, E, V)
-    return solve_ivp(rhs, x_span, (ψ0, ψ_p0), t_eval=np.linspace(x_span[0], x_span[1], 10000))
+    return solve_ivp(
+        rhs, x_span, (ψ0, ψ_p0), t_eval=np.linspace(x_span[0], x_span[1], 10000)
+    )
 
 
 def h_static_new(E: float) -> Tuple[np.ndarray, np.ndarray]:
@@ -119,18 +129,20 @@ def h_static_new(E: float) -> Tuple[np.ndarray, np.ndarray]:
     soln = solve_new(E, V_elec, ψ0, ψ_p0, x_span)
 
     norm = simps(np.conj(soln) * soln, x=soln.t)
-    return soln.t, soln/norm**.5
+    return soln.t, soln / norm ** 0.5
+
 
 ###
 
-
-def ti_schrod_rhs(E: float, V: Callable, x: float, y: Tuple[complex, complex]) -> Tuple[complex, complex]:
+def ti_schrod_rhs(
+    E: float, V: Callable, x: float, y: Tuple[complex, complex]
+) -> Tuple[complex, complex]:
     """
     d²ψ/dx² = 2m/ħ² * (V(x) - E)ψ
     """
     ψ, φ = y
     ψ_p = φ
-    φ_p = 2 * m_e / ħ**2 * (V(x) - E) * ψ
+    φ_p = 2 * m_e / ħ ** 2 * (V(x) - E) * ψ
 
     return ψ_p, φ_p
 
@@ -141,14 +153,16 @@ def solve(E: float, V: Callable, ψ0: float, ψ_p0: float, x_span: Tuple[float, 
     in time.
     """
     rhs = partial(ti_schrod_rhs, E, V)
-    return solve_ivp(rhs, x_span, (ψ0, ψ_p0), t_eval=np.linspace(x_span[0], x_span[1], 10000))
+    return solve_ivp(
+        rhs, x_span, (ψ0, ψ_p0), t_eval=np.linspace(x_span[0], x_span[1], 10000)
+    )
 
 
 def h_static(E: float) -> Tuple[np.ndarray, np.ndarray]:
     ψ0 = 0
     ψ_p0 = 5
 
-    x_span = (-100, .0000001)
+    x_span = (-100, 0.0000001)
 
     V_elec = partial(nuc_pot, [Nucleus(1, 0, 0, 0)])
 
@@ -160,7 +174,36 @@ def h_static(E: float) -> Tuple[np.ndarray, np.ndarray]:
     x = np.concatenate([soln_orig.t, np.flip(-soln_orig.t)])
 
     norm = simps(np.conj(soln) * soln, x=x)
-    return x, soln/norm**.5
+    return x, soln / norm ** 0.5
+
+
+def test_fft():
+    f = Fourier(0, [], [])
+    # print(f.value(1))
+    f.plot((-8, 8))
+
+
+def run_fft():
+    n = 1
+    E = -2 / (n + 1) ** 2
+    x, ψ = h_static(E)
+
+    # todo temp
+
+    x = np.linspace(-10, 10, 10_000)
+    ψ = np.zeros(len(x))
+    ψ += np.cos(x)
+    # ψ += np.sin(x/2)
+
+    result = fft(ψ)
+
+    fig, ax = plt.subplots()
+    ax.plot(x, result)
+    ax.grid(True)
+    # plt.xlim(-10, 10)
+    plt.show()
+
+    return result
 
 
 def plot_h_static():
@@ -169,7 +212,7 @@ def plot_h_static():
     # E should be a whittaker energy, ie -1/2, -2/9, -1/8, -.08 etc
     # Only odd states (n = 1, 3, 5 etc) correspond to 3d H atom.
     n = 1
-    E = -2/(n+1)**2
+    E = -2 / (n + 1) ** 2
     x, ψ = h_static(E)
 
     fig, ax = plt.subplots()
@@ -181,4 +224,6 @@ def plot_h_static():
 
 
 if __name__ == "__main__":
-    plot_h_static()
+    # plot_h_static()
+    run_fft()
+    # test_fft()

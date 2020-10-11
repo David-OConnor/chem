@@ -13,10 +13,10 @@ h3 = "prototype1d:plot_h_sph"
 op = "op:main"
 
 [tool.pyflow.dependencies]
-ipython = { version = "^7.5.0", extras = ["qtconsole"] }
-matplotlib = "^3.1.0"
-numpy = "^1.18.1"
-scipy = "^1.3.0"
+ipython = { version = "^7.18.1", extras = ["qtconsole"] }
+matplotlib = "^3.3.2"
+numpy = "^1.19.2"
+scipy = "^1.5.2"
 pyqt5 = "^5.13.0"
 qtconsole = "^4.5.5"
 plotly = "^4.5.2"

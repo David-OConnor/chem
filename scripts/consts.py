@@ -1,4 +1,5 @@
 import numpy as np
+
 π = np.pi
 
 i = complex(0, 1)
@@ -12,8 +13,6 @@ k = 1
 
 n = 1
 L = 10
-
-
 
 
 # h = 6.2607004e-34  #m^2 * kg /s

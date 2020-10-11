@@ -50,7 +50,7 @@ def nuc_potential(nuclei: Iterable[Nucleus], sx: float, sy: float) -> float:
     result = 0
     for nuclei in nuclei:
         # Coulomb potential
-        result -= e / abs(sqrt((nuclei.sx - sx)**2 + (nuclei.sy - sy)**2))
+        result -= e / abs(sqrt((nuclei.sx - sx) ** 2 + (nuclei.sy - sy) ** 2))
 
     return result
 
@@ -63,14 +63,18 @@ def ti_schrod(E: float, V: Callable, r: Tuple[float, float], psi):
     return ψ_p, φ_p
 
 
-def nuc_elec(E: float, V: Callable, ψ0: float, ψ_p0: float, x_span: Tuple[float, float]):
+def nuc_elec(
+    E: float, V: Callable, ψ0: float, ψ_p0: float, x_span: Tuple[float, float]
+):
     """
     Calculate the wave function for electrons in an arbitrary potential, at a single snapshot
     in time.
     """
 
     rhs = partial(ti_schrod, E, V)
-    return solve_ivp(rhs, x_span, (ψ0, ψ_p0), t_eval=np.linspace(x_span[0], x_span[1], 10000))
+    return solve_ivp(
+        rhs, x_span, (ψ0, ψ_p0), t_eval=np.linspace(x_span[0], x_span[1], 10000)
+    )
 
 
 def h_static(E: float):
@@ -78,9 +82,9 @@ def h_static(E: float):
     ψ0 = 0
     ψ_p0 = 1
 
-    E = -.5
+    E = -0.5
 
-    x_span = (-40, .0000001)
+    x_span = (-40, 0.0000001)
 
     V_elec = partial(nuc_potential, [Nucleus(1, 0, 0, 0, 0, 0)])
 
@@ -93,7 +97,7 @@ def h_static(E: float):
 
 def plot_h_static():
     n = 1
-    E = -2/(n+1)**2
+    E = -2 / (n + 1) ** 2
 
     # E = -.2543
 
@@ -109,7 +113,7 @@ def plot_h_static():
 
 def electron_potential(soln, n_electrons, sx: float, xy: float) -> float:
     # Approximate the electric potential by sampling points from the solution to the TISE.
-    prob = soln.y[0]**2
+    prob = soln.y[0] ** 2
 
     # Normalize the probability.
     total_prob = sum(prob)

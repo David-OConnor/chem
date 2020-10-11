@@ -25,6 +25,7 @@ class Electron:
     ψ: Callable[[float], float]
     spin: bool  # True for up
 
+
 def atoms_to_array(atoms: List[Nucleus]) -> np.array:
     # Convert atoms to an array we'll intergrate.
     # Each row is mass, n_protons, n_electrons, position, and velocity.
@@ -34,13 +35,13 @@ def atoms_to_array(atoms: List[Nucleus]) -> np.array:
         result[j] = np.array([atom.mass(), atom.n_prot, atom.sx, atom.vx])
     return result
 
+
 def h_static_pure(E: float) -> Tuple[np.ndarray, np.ndarray]:
     """No massasging past the singularity"""
-    ψ0 = .2
+    ψ0 = 0.2
     ψ_p0 = 0
 
-
-    x_span = (-40, .0000001)
+    x_span = (-40, 0.0000001)
 
     V_elec = partial(nuc_pot, [Nucleus(1, 0, 0, 0)])
 
@@ -49,12 +50,12 @@ def h_static_pure(E: float) -> Tuple[np.ndarray, np.ndarray]:
     x, soln = soln.t, soln.y[0]
 
     norm = simps(np.conj(soln) * soln, x=x)
-    return x, soln/norm**.5
+    return x, soln / norm ** 0.5
 
 
 def electron_potential(soln, n_electrons, sx: float) -> float:
     # Approximate the electric potential by sampling points from the solution to the TISE.
-    prob = soln.y[0]**2
+    prob = soln.y[0] ** 2
 
     # Normalize the probability.
     total_prob = sum(prob)
@@ -75,10 +76,12 @@ def td_schrod_t(d2𝚿_dx2: complex, V: float, t: float, 𝚿: complex):
     """
     d𝚿/dt = -ħ²/2miħ * d²𝚿/dx² + V(x)𝚿
     """
-    return -ħ**2/(2*m_e*i*ħ) * (d2𝚿_dx2 + V) * 𝚿
+    return -(ħ ** 2) / (2 * m_e * i * ħ) * (d2𝚿_dx2 + V) * 𝚿
 
 
-def evolve_de(x: np.ndarray, ψ0: np.ndarray, dt: float) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+def evolve_de(
+    x: np.ndarray, ψ0: np.ndarray, dt: float
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     In this approach, we solve the full PDE of x and t: iħ*dψ/dt = Hψ.
     We use the Method of Lines to discretize x, then solve as an ODE over t.
@@ -96,7 +99,7 @@ def evolve_de(x: np.ndarray, ψ0: np.ndarray, dt: float) -> Tuple[np.ndarray, np
 
     t = np.arange(0, x.size)  # todo
     ψ = ψ0
-    x_span = (-40, .0000001)  # todo sync with other one
+    x_span = (-40, 0.0000001)  # todo sync with other one
     V = partial(nuc_pot, [Nucleus(1, 0, 0, 0)])
 
     # Iterate over each x value, to find its corresponding one one time-step later.
@@ -134,7 +137,9 @@ def plot_h_evolve_de():
     _, state1 = h_static_pure(E1)
     x, state2 = h_static_pure(E2)
 
-    ψ_0 = sqrt(2)/2 * state1 + sqrt(2)/2 * state2  # A wall boundary condition, across all x, for t=0
+    ψ_0 = (
+        sqrt(2) / 2 * state1 + sqrt(2) / 2 * state2
+    )  # A wall boundary condition, across all x, for t=0
 
     ψ_0 = state1
 
@@ -159,7 +164,7 @@ def plot_h_evolve_de():
 
 
 def plot_h_evolve():
-    dt = .5
+    dt = 0.5
     ev = lambda E: exp(-i * dt * E / ħ)
 
     n = 1
@@ -170,7 +175,7 @@ def plot_h_evolve():
     x, ψ1 = h_static(E1)
     _, ψ2 = h_static(E2)
 
-    state = [(sqrt(2)/2, E1), (sqrt(2)/2, E2)]
+    state = [(sqrt(2) / 2, E1), (sqrt(2) / 2, E2)]
 
     fig, ax = plt.subplots()
 
@@ -223,13 +228,12 @@ def rhs_nbody(atoms: Iterable[Nucleus], t: float, y: np.array):
     # Don't have number of neutrons here
     atoms2 = [Nucleus(a[1], 0, a[3], a[4]) for a in y_flat]
 
-
     # Chicken-egg scenario with calculating electric potential, so use the previous
     # iteration's field.
     soln_elec = solve(E, V_prev)
 
     # todo wrong! y[t] is y at diff posit, not time.
-    E = i * ħ * soln_elec.y[t] - soln_elec.y[t-1]
+    E = i * ħ * soln_elec.y[t] - soln_elec.y[t - 1]
 
     # is this right???
     total_n_elec = sum(atom.n_elec for atom in y_flat)
@@ -278,7 +282,9 @@ def nbody():
 
     # for Ψ0 in np.linspace()
 
-    soln = solve_ivp(rhs, t_span, atoms_flat, t_eval=np.linspace(t_span[0], t_span[1], 1000))
+    soln = solve_ivp(
+        rhs, t_span, atoms_flat, t_eval=np.linspace(t_span[0], t_span[1], 1000)
+    )
 
     plt.plot(soln.y[0])
     plt.show()

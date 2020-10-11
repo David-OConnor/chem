@@ -1,20 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
   <component name="CargoProjects">
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="63843798-86fc-4cf6-9df5-0d52eff0dddc" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/scripts/integ.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scripts/wf_splitting.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/1d_eig.py" beforeDir="false" afterPath="$PROJECT_DIR$/1d_eig.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/powerseries.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/powerseries.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pyflow.lock" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pyflow.lock" beforeDir="false" afterPath="$PROJECT_DIR$/pyflow.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pyproject.toml" beforeDir="false" afterPath="$PROJECT_DIR$/pyproject.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/consts.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/consts.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/integ.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/integ.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/p1d.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/p1d.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/p1d_more.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/p1d_more.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/p2d.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/p2d.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/p3d.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/p3d.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/powerseries.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/series.py" afterDir="false" />
     </list>
-    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -47,14 +67,20 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="JupyterTrust" id="3378e1df-3d2e-47a4-ae59-58f98d734d04" />
   <component name="MacroExpansionManager">
     <option name="directoryName" value="ZLwoJsIx" />
   </component>
   <component name="ProjectId" id="1Q4hNIIaw7Aqy4s5QGdyzKfMrqj" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
   <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$USER_HOME$/Desktop/intellij-rust" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -80,18 +106,6 @@
       <recent name="C:\Users\david\code\chem\fe" />
       <recent name="$PROJECT_DIR$" />
     </key>
-  </component>
-  <component name="RunDashboard">
-    <option name="ruleStates">
-      <list>
-        <RuleState>
-          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
-        </RuleState>
-        <RuleState>
-          <option name="name" value="StatusDashboardGroupingRule" />
-        </RuleState>
-      </list>
-    </option>
   </component>
   <component name="RunManager" selected="Python.1d">
     <configuration name="1d" type="PythonConfigurationType" factoryName="Python">
@@ -169,6 +183,7 @@
     <option name="toolchainHomeDirectory" value="$USER_HOME$/.cargo/bin" />
     <option name="version" value="2" />
   </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -323,34 +338,33 @@
       <workItem from="1583012498645" duration="2706000" />
       <workItem from="1583015858395" duration="289000" />
       <workItem from="1583016185466" duration="11411000" />
-      <workItem from="1583374501692" duration="12921000" />
+      <workItem from="1583374501692" duration="24289000" />
+      <workItem from="1583703028273" duration="3082000" />
+      <workItem from="1583969125418" duration="611000" />
+      <workItem from="1583975718880" duration="1198000" />
+      <workItem from="1584193953503" duration="1797000" />
+      <workItem from="1585104104756" duration="2389000" />
+      <workItem from="1585154050756" duration="1870000" />
+      <workItem from="1585242217824" duration="609000" />
+      <workItem from="1588484013548" duration="230000" />
+      <workItem from="1602363146739" duration="11589000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="1" />
-    <option name="exactExcludedFiles">
-      <list>
-        <option value="$PROJECT_DIR$/../pyflow/__pypackages__/3.8/.venv/share/jupyter/lab/staging/node_modules/vega-schema-url-parser/index.js.map" />
-        <option value="$PROJECT_DIR$/../pyflow/__pypackages__/3.8/.venv/share/jupyter/lab/staging/node_modules/vega-schema-url-parser/index.js" />
-        <option value="$PROJECT_DIR$/../pyflow/__pypackages__/3.8/.venv/share/jupyter/lab/staging/node_modules/vega-schema-url-parser/index.d.ts" />
-        <option value="$PROJECT_DIR$/../pyflow/__pypackages__/3.8/.venv/share/jupyter/lab/staging/node_modules/fast-json-patch/index.js" />
-        <option value="$PROJECT_DIR$/../pyflow/__pypackages__/3.8/.venv/share/jupyter/lab/staging/node_modules/fast-json-patch/index.d.ts" />
-      </list>
-    </option>
+    <option name="version" value="3" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
       <map>
         <entry key="MAIN">
           <value>
-            <State>
-              <option name="COLUMN_ORDER" />
-            </State>
+            <State />
           </value>
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/chem$1d.coverage" NAME="1d Coverage Results" MODIFIED="1559427278925" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />

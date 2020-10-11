@@ -54,9 +54,19 @@ def atoms_to_array(atoms: List[Nucleus]) -> np.array:
     result = np.empty(len(atoms), ATOM_ARR_LEN)
 
     for j, atom in enumerate(atoms):
-        result[j] = np.array([atom.mass(), atom.n_prot, atom.n_elec,
-                              atom.s.x, atom.s.y, atom.s.z,
-                              atom.v.x, atom.v.y, atom.v.z])
+        result[j] = np.array(
+            [
+                atom.mass(),
+                atom.n_prot,
+                atom.n_elec,
+                atom.s.x,
+                atom.s.y,
+                atom.s.z,
+                atom.v.x,
+                atom.v.y,
+                atom.v.z,
+            ]
+        )
     return result
 
 
@@ -102,12 +112,14 @@ def elec(E: float, V: Callable):
     """
     x_span = (0.001, 2)
 
-    ψ0 = .1
-    ψ_p0 = .022
+    ψ0 = 0.1
+    ψ_p0 = 0.022
 
     rhs = partial(schrod, E, V)
 
-    soln = solve_ivp(rhs, x_span, (ψ0, ψ_p0), t_eval=np.linspace(x_span[0], x_span[1], 1000))
+    soln = solve_ivp(
+        rhs, x_span, (ψ0, ψ_p0), t_eval=np.linspace(x_span[0], x_span[1], 1000)
+    )
 
     return soln
 
@@ -118,7 +130,9 @@ def nuc_potential(bodies: Iterable[Nucleus], n_electrons: int, s: Coord) -> floa
         # Coulomb potential
         # result += e * body.charge() / np.sqrt((body.sx - sx)**2 + (body.sy - sy**2) + (body.sz - sz)**2)
 
-        dist = np.sqrt((body.s.x - s.x)**2 + (body.s.y - s.y**2) + (body.s.z - s.z)**2)
+        dist = np.sqrt(
+            (body.s.x - s.x) ** 2 + (body.s.y - s.y ** 2) + (body.s.z - s.z) ** 2
+        )
 
         # Coulomb
         result -= e * n_electrons * body.charge() / dist
@@ -126,17 +140,17 @@ def nuc_potential(bodies: Iterable[Nucleus], n_electrons: int, s: Coord) -> floa
         l = 1
 
         # Centrifigal force
-        result += ħ**2 * l*(l+1) / (2*m_e * dist**2)
+        result += ħ ** 2 * l * (l + 1) / (2 * m_e * dist ** 2)
 
     return result
 
 
 def hydrogen_static():
     """A time-independent simulation of the electron cloud surrounding a hydrogen atom"""
-    E = -.007  # todo how do I set this?
+    E = -0.007  # todo how do I set this?
 
     # ground level hydrogen: 13.6eV
-    E = 1/2
+    E = 1 / 2
 
     V = partial(nuc_potential, [Nucleus(1, 0, 0, 0, 0, 0, 0, 0)])
 
@@ -152,7 +166,7 @@ def hydrogen_static():
 
 def electron_potential(soln, n_electrons, sx: float) -> float:
     # Approximate the electric potential by sampling points from the solution to the TISE.
-    prob = soln.y[0]**2
+    prob = soln.y[0] ** 2
 
     # Normalize the probability.
     total_prob = sum(prob)
