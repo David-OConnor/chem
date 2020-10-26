@@ -2,12 +2,14 @@ from dataclasses import dataclass
 from typing import List, Tuple
 
 import numpy as np
-from numpy import pi as π
+from numpy import pi as π, exp
 from math import factorial
 import matplotlib.pyplot as plt
 
+from p1d import h_static
+
 i = complex(0, 1)
-τ = 2 * np.pi
+τ = 2 * π
 
 
 @dataclass
@@ -17,10 +19,6 @@ class FourierReal:
     a_0: complex  # todo: Eschew in favor of being the first coef?
     coeffs: List[Tuple[complex, complex]]  # ie [(a1, b1), (a2, b2)]
     P: float  # Period
-
-    # @classmethod
-    # def from_fn(cls, a_0: float, fn: Callable, precision: float):
-    #     Fourier(a_0, callable(, 0) for n in range(1, 100))
 
     def value(self, x: complex) -> complex:
         result = self.a_0 / 2
@@ -43,47 +41,42 @@ class FourierReal:
 @dataclass
 class Fourier:
     """A Fourier series to arbitrary precision."""
+
     coeff_0: complex  # n = 0
     coeffs_pos: List[complex]  # Positive coefficients: n = 1, 2, 3...
     coeffs_neg: List[complex]  # Negative coefficients: n = -1, -2, -3...
-    P: float  # Period
+    P: float = τ  # Period
 
-    def __init__(
-        self,
-        coeff_0: complex,
-        coeffs_pos: List[complex],
-        coeffs_neg: List[complex],
-
-        P: float = τ,
-    ):
-        """This constructor allows us to use a default period."""
-        self.coeffs_pos = coeffs_pos
-        self.coeffs_neg = coeffs_neg
-        self.coeff_0 = coeff_0
-        self.P = P
-
+    # todo: Vectorize?
     def value(self, t: float) -> complex:
+        """Get a single value."""
         result = self.coeff_0
 
         for n, c in enumerate(self.coeffs_pos, 1):
-            result += c * np.exp(i * τ * n * t / self.P)
+            result += c * exp(i * τ * n * t / self.P)
 
         for n, c in enumerate(self.coeffs_neg, 1):
-            result += c * np.exp(-i * τ * n * t / self.P)
+            result += c * exp(-i * τ * n * t / self.P)
 
         return result
 
-    def plot(self, range_: Tuple[float, float], size: int = 10_000) -> None:
+    def populate(
+        self, range_: Tuple[float, float], size: int = 10_000
+    ) -> Tuple[np.ndarray, np.ndarray]:
+        """Make a series of the data."""
         t = np.linspace(range_[0], range_[1], size)
-        y_real = np.empty(t.size)
-        y_imag = np.empty(t.size)
-        for j, v in enumerate(t):
-            value = self.value(v)
-            y_real[j] = value.real
-            y_imag[j] = value.imag
+        y = np.empty(t.size, dtype=np.complex128)
 
-        plt.plot(t, y_real)
-        plt.plot(t, y_imag)
+        for j, v in enumerate(t):
+            y[j] = self.value(v)
+
+        return t, y
+
+    def plot(self, range_: Tuple[float, float], size: int = 10_000) -> None:
+        t, y = self.populate(range_, size)
+
+        plt.plot(t, y.real)
+        plt.plot(t, y.imag)
         plt.show()
 
         # def scatter(self, range_: Tuple[float, float]) -> None:
@@ -112,13 +105,69 @@ class Taylor:
             result += f_a * (x - self.a) ** n_ / factorial(n_)
         return result
 
-    def plot(self, range_: Tuple[float, float]) -> None:
-        x = np.linspace(range_[0], range_[1], 1000)
-        y = []
-        for v in x:
-            y.append(self.value(v))
+    def populate(
+        self, range_: Tuple[float, float], size: int = 10_000
+    ) -> Tuple[np.ndarray, np.ndarray]:
+        # todo: DRY with Fourier populate.
+        t = np.linspace(range_[0], range_[1], size)
+        y = np.empty(t.size, dtype=np.complex128)
 
-        plt.plot(x, y)
+        for j, v in enumerate(t):
+            y[j] = self.value(v)
+
+        return t, y
+
+    def plot(self, range_: Tuple[float, float], size: int = 10_000) -> None:
+        # todo: DRY with Fourier plot.
+        t, y = self.populate(range_, size)
+
+        plt.plot(t, y.real)
+        plt.plot(t, y.imag)
+        plt.show()
+
+
+@dataclass
+class Hydrogen:
+    """A series using s=0 hydrogen atom wavefunctions at different energy levels."""
+    # todo: Or is it n = 1, 3, 5...
+    coeffs: List[complex]  # Positive coefficients: n = 0, 1, 2, 3...
+
+    x: np.ndarray
+    components: List[np.ndarray]
+
+    def __init__(self, coeffs: List[complex]):
+        self.coeffs = coeffs
+        self.components = []
+
+        n = 1   # todo: Only odd 1d coeffs for now.
+        for c in self.coeffs:
+            E = -2 / (n + 1) ** 2
+            x, ψ = h_static(E)
+
+            if n == 1:
+                self.x = x
+            self.components.append(c * ψ)
+
+            n += 2
+
+    def value(self, t: float) -> complex:
+        """Get a single value."""
+        result = 0
+
+        # todo: Populate this.
+
+        return result
+
+    def plot(self, range_: Tuple[float, float], size: int = 10_000) -> None:
+
+        ψ = np.zeros(len(self.x))
+        for ψi in self.components:
+            ψ += ψi
+
+        # todo: DRY with other series'
+        plt.plot(self.x, ψ.real)
+        plt.plot(self.x, ψ.imag)
+        plt.xlim(range_[0], range_[1])
         plt.show()
 
 
