@@ -2,9 +2,10 @@ from dataclasses import dataclass
 from typing import List, Tuple
 
 import numpy as np
-from numpy import pi as π, exp
+from numpy import pi as π, exp, sin, cos, exp
 from math import factorial
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 from p1d import h_static
 
@@ -126,6 +127,10 @@ class Taylor:
         plt.show()
 
 
+# todo: Can we use this 1d WF, then as we rotation through (2d for now) space, vary
+# todo the coefficients to produce (2d for now )wfs? Start with just a single H atom.
+# ns: Just rotate the [n, 0...] around with no modifications.
+
 @dataclass
 class Hydrogen:
     """A series using s=0 hydrogen atom wavefunctions at different energy levels."""
@@ -150,24 +155,83 @@ class Hydrogen:
 
             n += 2
 
-    def value(self, t: float) -> complex:
+    def value(self, x: float) -> complex:
         """Get a single value."""
         result = 0
+        for comp in self.components:
+            result += np.interp([x], self.x, comp)
 
-        # todo: Populate this.
+        return result[0]
 
-        return result
+    def plot(self, range_: Tuple[float, float] = (-20, 20), size: int = 10_000) -> None:
 
-    def plot(self, range_: Tuple[float, float], size: int = 10_000) -> None:
-
-        ψ = np.zeros(len(self.x))
+        ψ = np.zeros(len(self.x), dtype=np.complex128)
         for ψi in self.components:
             ψ += ψi
 
+
+
         # todo: DRY with other series'
-        plt.plot(self.x, ψ.real)
-        plt.plot(self.x, ψ.imag)
-        plt.xlim(range_[0], range_[1])
+        plt.plot(self.x, np.conj(ψ.real) * ψ.real)
+        # plt.plot(self.x, ψ.imag)
+        # plt.xlim(range_[0], range_[1])
+        plt.xlim(0, range_[1])
+        plt.show()
+
+    def plot_2d(self) -> None:
+        # The "blending" etc can be a periodic fn, like a sinusoid etc, over radials.
+
+        # all 0 counts include the decay, and center.
+
+        # for 1D:
+        # n=0: start high, decay. Peaks: .15
+        # n=1: start 0, decay. Peaks: 1
+        # n=2: start high, cross once, decay. Peaks: .1, 2.7
+        # n=3: Start 0, cross once, decay. Peaks: .76, 5.23
+        # n=4: Start high, cross 2x, decay
+        # n=5: Start 0, cross 2x, decay. Peaks: .74, 4.18, 13
+        # n=6: start high: cross 3x, decay
+
+        # Let n be odd only: (n+1)/2 + 1 = num zeros.
+
+        # good diagrams:
+        # https://en.wikipedia.org/wiki/Atomic_orbital
+
+        # for 2D:
+        # (n, l, (m_(l/s)). n is number of 0s. l is number of symmetry lines?. m is...?
+
+        # 3D:
+        # n is number of 0s. l is number of symmetry lines?. m+1 = num of rotations
+        # - m=0 have one rotational sym axis.
+
+        # todo: Start with n=2, and a sin wave of amplitude
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+
+        # Create the mesh in polar coordinates and compute corresponding Z.
+        # r = np.linspace(0, 1.25, 50)
+        r = np.linspace(0, 8, 50)
+        p = np.linspace(0, τ, 50)
+
+        R, P = np.meshgrid(r, p)
+
+        # Z = ((R ** 2 - 1) ** 2)
+        Z = np.array([self.value(r) for r in R]) #* sin(P)
+        # Z = R
+        Z = Z**2
+
+        # Express the mesh in the cartesian system.
+        X, Y = R * cos(P), R * sin(P)
+
+        # Plot the surface.
+        ax.plot_surface(X, Y, Z, cmap=plt.cm.YlGnBu_r)
+
+        # Tweak the limits and add latex math labels.
+        ax.set_zlim(0, 10)
+        ax.set_xlabel(r'$x$')
+        ax.set_ylabel(r'$y$')
+        ax.set_zlabel(r'$\psi$')
+
         plt.show()
 
 
