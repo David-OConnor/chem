@@ -8,7 +8,7 @@ from consts import *
 from functools import partial
 from typing import List, Iterable, Callable, Tuple
 
-from numpy import exp
+from numpy import exp, ndarray
 
 import numpy as np
 
@@ -107,7 +107,7 @@ def solve_new(
     )
 
 
-def h_static_new(E: float) -> Tuple[np.ndarray, np.ndarray]:
+def h_static_new(E: float) -> Tuple[ndarray, ndarray]:
 
     # todo: Think about what your constraints should be.
     # todo: Perhaps you're looking for any constraint that guarantees a "non-blown-up" soln.
@@ -158,7 +158,7 @@ def solve(E: float, V: Callable, ψ0: float, ψ_p0: float, x_span: Tuple[float, 
     )
 
 
-def h_static(E: float) -> Tuple[np.ndarray, np.ndarray]:
+def h_static(E: float) -> Tuple[ndarray, ndarray]:
     ψ0 = 0
     ψ_p0 = 1
     # x_span = (-100, 0.0000001)
@@ -347,7 +347,7 @@ def gen_inv_gaus():
     pass
 
 
-def make_hyd_dist(a: float, b: float) -> np.ndarray:
+def make_hyd_dist(a: float, b: float) -> ndarray:
     pass
 
 
@@ -377,29 +377,59 @@ def hyd_dist():
     plt.show()
 
 
-def h2():
-    """Use linear superpositions of variations of the n=1 (E=-1/2) solution of the 1D Hydrogen
-    atom to get solutions for higher n."""
+def check_wf_1d(x: ndarray, ψ: ndarray, E: float) -> ndarray:
+    """Given a wave function as a set of discrete points, (Or a fn?) determine how much
+    it close it is to the schrodinger equation by analyzing the derivatives.
+    The result is a percent diff.
 
-    # We're trying to replicate this:
+    Check against ψ*() = -1/2 ψ''
+    ψ = -1/2ψ'' / (E-1/abs(r))
+    """
+
+    # todo: Center it up? This approach lags.
+    # ψ_pp = np.diff(np.diff(ψ))
+    dx = (x[-1] - x[0]) / x.size
+
+    ψ_pp = np.diff(np.diff(ψ)) / dx
+    ψ_pp = np.append(ψ_pp, np.array([0, 0]))  # make the lengths match
+
+    plt.plot(x, ψ)
+    plt.plot(x, ψ_pp)
+    plt.xlim(0, 10)
+    plt.show()
+
+    # For now, assume assume a single protein in the nucleus, at x=0.
+
+    ψ_ideal = -1/2 * ψ_pp / (E - 1/np.abs(x))
+
+    result = (ψ - ψ_ideal) / ψ_ideal
+
+    plt.plot(x, result)
+    plt.xlim(0, 10)
+    plt.show()
+
+    return result
+
+
+
+
+# def check_wf(ψ: Callable[(float, float), ]):
+def check_wf_2d(ψ: ndarray):
+    """Given a wave function as a set of discrete points, (Or a fn?) determine how much
+    it close it is to the schrodinger equation by analyzing the derivatives."""
+    pass
+
+
+def run_check():
     n = 1
     E = -2 / (n + 1) ** 2
+
     x, ψ = h_static(E)
-
-    ψ_working = ψ
-
-    fig, ax = plt.subplots()
-
-    ax.plot(x, ψ)
-    ax.plot(x, ψ_working)
-
-    ax.grid(True)
-    plt.xlim(-10, 10)
-    plt.show()
+    print(check_wf_1d(x, ψ, E))
 
 
 if __name__ == "__main__":
-    plot_h_static(1)
+    # plot_h_static(1)
     # test_fft()
     # run_fft()
     # reimann()
@@ -407,3 +437,5 @@ if __name__ == "__main__":
     # test_fourier()
     # inv_gauss()
     # h2()
+
+    run_check()

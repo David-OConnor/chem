@@ -25,6 +25,7 @@
     <list default="true" id="63843798-86fc-4cf6-9df5-0d52eff0dddc" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pyflow.lock" beforeDir="false" afterPath="$PROJECT_DIR$/pyflow.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/p1d.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/p1d.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/series.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/series.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -341,7 +342,7 @@
       <workItem from="1588484013548" duration="230000" />
       <workItem from="1602363146739" duration="31757000" />
       <workItem from="1602766758546" duration="4158000" />
-      <workItem from="1603415350648" duration="14711000" />
+      <workItem from="1603415350648" duration="22989000" />
     </task>
     <servers />
   </component>

@@ -144,16 +144,20 @@ class Hydrogen:
         self.coeffs = coeffs
         self.components = []
 
-        n = 1   # todo: Only odd 1d coeffs for now.
+        # n = 1   # todo: Only odd 1d coeffs for now.
+        n = 0   # todo: Only odd 1d coeffs for now.
         for c in self.coeffs:
             E = -2 / (n + 1) ** 2
             x, ψ = h_static(E)
 
-            if n == 1:
+            # if n == 1:
+            if n == 0:
                 self.x = x
+
             self.components.append(c * ψ)
 
-            n += 2
+            # n += 2
+            n += 1
 
     def value(self, x: float) -> complex:
         """Get a single value."""
@@ -210,15 +214,14 @@ class Hydrogen:
 
         # Create the mesh in polar coordinates and compute corresponding Z.
         # r = np.linspace(0, 1.25, 50)
-        r = np.linspace(0, 8, 50)
-        p = np.linspace(0, τ, 50)
+        r = np.linspace(0, 12, 100)
+        p = np.linspace(0, τ, 100)
 
         R, P = np.meshgrid(r, p)
 
-        # Z = ((R ** 2 - 1) ** 2)
-        Z = np.array([self.value(r) for r in R]) #* sin(P)
-        # Z = R
-        Z = Z**2
+        Z = np.array([self.value(r) for r in R])
+        # Z *= sin(2*P)
+        Z = Z**2θ
 
         # Express the mesh in the cartesian system.
         X, Y = R * cos(P), R * sin(P)
@@ -227,12 +230,19 @@ class Hydrogen:
         ax.plot_surface(X, Y, Z, cmap=plt.cm.YlGnBu_r)
 
         # Tweak the limits and add latex math labels.
-        ax.set_zlim(0, 10)
+        ax.set_zlim(0, 0.4)
         ax.set_xlabel(r'$x$')
         ax.set_ylabel(r'$y$')
         ax.set_zlabel(r'$\psi$')
+        ax.grid(False)
 
         plt.show()
+
+        # n on left refers to 1d n.
+        # n = 1, θ: (1, 0, 0)
+        # n = , θ: (2, 0, 0) φ
+        # n=3, sin(θ): (3, 1, 0)
+        # n=3, cos(θ): (3, 1, 1)
 
 
 def fourier_ode():
