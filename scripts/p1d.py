@@ -8,7 +8,7 @@ from consts import *
 from functools import partial
 from typing import List, Iterable, Callable, Tuple
 
-from numpy import exp, ndarray
+from numpy import exp, ndarray, sqrt
 
 import numpy as np
 
@@ -19,6 +19,27 @@ import matplotlib
 
 τ = 2 * np.pi
 i = complex(0, 1)
+
+# 2020-11-15
+"""
+One of your goals is to figure out if you can use hydrogen (1d?) WFs as basis functions to create
+arbitrary solns to the Schrodinger equation, thereby making chemistry simulation and modeling
+much more computationally efficient.
+
+It appears that for Hydrogen atoms, you can use linear combinations of 1D WFs as basis functions
+in 2 adn 3d by choosing the right coefficients, and the right modifier fn (sin, cos etc) across
+θ and φ to apply to 2 and 3d situations.
+
+You need to verify that this is correct adn quantify. A challenge is finding accurate 2D orbitals
+to compare your results to, and in visualizing and/or quantifying your 3D results to compare
+to real results in 3d.
+
+In parallel to verifying this, assume it's right, and try to model a 2-nucleus system. For
+example, a H2 molecule. Attempt, in 1D, to find a combination of H atomic orbitals (perhaps
+offset in x) that create the H2 molecular orbitals. These orbitals you're attempting to
+match can be taken from real data, or by integrating. (May need to break up integration
+into three areas, to avoid singularities at each nucleus).
+"""
 
 
 matplotlib.use("Qt5Agg")
@@ -70,70 +91,6 @@ def nuc_pot(nuclei: Iterable[Nucleus], sx: float) -> float:
     return result
 
 
-###
-
-
-def ti_schrod_rhs_new(
-    E: float, V: Callable, x: complex, y: Tuple[complex, complex]
-) -> Tuple[complex, complex]:
-    """
-    d²ψ/dx² = 2m/ħ² * (V(x) - E)ψ
-    """
-    ψ, φ = y
-    ψ_p = φ
-    φ_p = 2 * m_e / ħ ** 2 * (V(x) - E) * ψ
-
-    return ψ_p, φ_p
-
-
-def solve_new(
-    E: float, V: Callable, ψ0: complex, ψ_p0: complex, x_span: Tuple[complex, complex]
-):
-    """
-    Calculate the wave function for electrons in an arbitrary potential, at a single snapshot
-    in time.
-    """
-
-    # todo: Cage yourself. You're evaluating two related concepts: 1 -Applying complex numbers
-    # todo to all phases of the problem (Try making each axis complex), and 2 - Trying to find a more global approach to iterating,
-    # todo that solves the problem without iterating along x from a point. If you can produce
-    # todo the same result as the traditional approach without encountering a singularity,
-    # todo, there's a good chance you've succeeded.
-    # todo: Some type of self-consistent procedure?
-
-    rhs = partial(ti_schrod_rhs_new, E, V)
-    return solve_ivp(
-        rhs, x_span, (ψ0, ψ_p0), t_eval=np.linspace(x_span[0], x_span[1], 10000)
-    )
-
-
-def h_static_new(E: float) -> Tuple[ndarray, ndarray]:
-
-    # todo: Think about what your constraints should be.
-    # todo: Perhaps you're looking for any constraint that guarantees a "non-blown-up" soln.
-
-    # todo Shower thought: Is this wf shape we see on a graph a slice of a higher-D landscape?
-
-    # how does E tie in ?
-    # How can we find the energy *landscape* as hills/valleys etc, where E values can
-    # be chosen?
-
-    ψ_inf = 0 + 0 * i
-
-    x_span = (-100, 100)
-
-    V_elec = partial(nuc_pot, [Nucleus(1, 0, 0, 0)])
-
-    # Left and right of the x=0 coulomb singularity. Assume odd solution around x=0.
-    soln = solve_new(E, V_elec, ψ0, ψ_p0, x_span)
-
-    norm = simps(np.conj(soln) * soln, x=soln.t)
-    return soln.t, soln / norm ** 0.5
-
-
-###
-
-
 def ti_schrod_rhs(
     E: float, V: Callable, x: float, y: Tuple[complex, complex]
 ) -> Tuple[complex, complex]:
@@ -161,10 +118,11 @@ def solve(E: float, V: Callable, ψ0: float, ψ_p0: float, x_span: Tuple[float, 
 def h_static(E: float) -> Tuple[ndarray, ndarray]:
     ψ0 = 0
     ψ_p0 = 1
-    # x_span = (-100, 0.0000001)
     x_span = (-100, 0.0000001)
+    # x_span = (.000001, 1)
 
     V_elec = partial(nuc_pot, [Nucleus(1, 0, 0, 0)])
+    # V_elec = partial(nuc_pot, [Nucleus(1, 0, 0, 0), Nucleus(1, 0, 1, 0)])
 
     # Left and right of the x=0 coulomb singularity. Assume odd solution around x=0.
     soln_orig = solve(E, V_elec, ψ0, ψ_p0, x_span)
@@ -178,6 +136,8 @@ def h_static(E: float) -> Tuple[ndarray, ndarray]:
 
 
 def plot_h_static(n: int = 1):
+    """This 1d model represents the radial component of the wave function;
+    ie all of a 2d shell condensed down 2 dimensions to a point."""
     # Negative E implies bound state; positive scattering.
     # ψ_p0 should be 0 for continuity across the origin.
     # E should be a whittaker energy, ie -1/2, -2/9, -1/8, -.08 etc
@@ -187,15 +147,41 @@ def plot_h_static(n: int = 1):
 
     fig, ax = plt.subplots()
     ax.plot(x, ψ)
-    # ax.plot(x, np.conj(ψ) * ψ)
+
     ax.grid(True)
     plt.xlim(-20, 20)
     plt.show()
 
 
-def test_fft():
-    f = Fourier(0, [1], [0])
-    f.plot((-8, 8))
+def plot_h_static3d(n: int = 1):
+    """Like H static, but perhaps this is the right model for 3D."""
+    E = -2 / (n + 1) ** 2
+    x, ψ = h_static(E)
+
+    ψ = sqrt(ψ**2 / x**2)
+
+    # Post-process by flipping between 0s, to make up for info lost
+    # during square root.
+    ε = 1e-5  # thresh for hit a 0.
+    ψ_processed = ψ
+    in_inversion = False
+
+    for j in range(ψ.size):
+        if ψ[j] <= ε:
+            in_inversion = not in_inversion
+
+        if in_inversion:
+            ψ_processed[j] = -ψ[j]
+        else:
+            ψ_processed[j] = ψ[j]
+
+    fig, ax = plt.subplots()
+    ax.plot(x, ψ)
+
+    ax.grid(True)
+    plt.xlim(-10, 10)
+    plt.ylim(-3, 3)
+    plt.show()
 
 
 def reimann():
@@ -218,172 +204,15 @@ def reimann():
     return result
 
 
-def run_fft():
-    n = 1
-    E = -2 / (n + 1) ** 2
-    x, ψ = h_static(E)
-
-    ψ = ψ.astype(np.complex128)
-
-    x = np.linspace(-10, 10, x.size, dtype=np.complex128)
-
-    ψ = np.zeros(len(x), dtype=np.complex128)
-    ψ += exp(1 * i * x)  # this should give us 0, [1], [0]
-
-    result = fft(ψ)
-
-    fig, ax = plt.subplots()
-    ax.plot(x, result)
-    ax.grid(True)
-    # plt.xlim(-10, 10)
-    plt.show()
-
-    return result
-
-
-def fourier_series_coeff_numpy(f, T, N, return_complex=False):
-    """Calculates the first 2*N+1 Fourier series coeff. of a periodic function.
-
-    Given a periodic, function f(t) with period T, this function returns the
-    coefficients a0, {a1,a2,...},{b1,b2,...} such that:
-
-    f(t) ~= a0/2+ sum_{k=1}^{N} ( a_k*cos(2*pi*k*t/T) + b_k*sin(2*pi*k*t/T) )
-
-    If return_complex is set to True, it returns instead the coefficients
-    {c0,c1,c2,...}
-    such that:
-
-    f(t) ~= sum_{k=-N}^{N} c_k * exp(i*2*pi*k*t/T)
-
-    where we define c_{-n} = complex_conjugate(c_{n})
-
-    Refer to wikipedia for the relation between the real-valued and complex
-    valued coeffs at http://en.wikipedia.org/wiki/Fourier_series.
-
-    Parameters
-    ----------
-    f : the periodic function, a callable like f(t)
-    T : the period of the function f, so that f(0)==f(T)
-    N_max : the function will return the first N_max + 1 Fourier coeff.
-
-    Returns
-    -------
-    if return_complex == False, the function returns:
-
-    a0 : float
-    a,b : numpy float arrays describing respectively the cosine and sine coeff.
-
-    if return_complex == True, the function returns:
-
-    c : numpy 1-dimensional complex-valued array of size N+1
-
-    """
-    # From Shanon theoreom we must use a sampling freq. larger than the maximum
-    # frequency you want to catch in the signal.
-    f_sample = 2 * N
-    # we also need to use an integer sampling frequency, or the
-    # points will not be equispaced between 0 and 1. We then add +2 to f_sample
-    t, dt = np.linspace(0, T, f_sample + 2, endpoint=False, retstep=True)
-
-    y = np.fft.rfft(f(t)) / t.size
-
-    if return_complex:
-        return y
-    else:
-        y *= 2
-        return y[0].real, y[1:-1].real, -y[1:-1].imag
-
-
-def fft2():
-    from numpy import ones_like, cos, pi, sin, allclose
-
-    T = 1.5  # any real number
-
-    def f(t):
-        """example of periodic function in [0,T]"""
-        n1, n2, n3 = 1.0, 4.0, 7.0  # in Hz, or nondimensional for the matter.
-        a0, a1, b4, a7 = 4.0, 2.0, -1.0, -3
-        return (
-            a0 / 2 * ones_like(t)
-            + a1 * cos(2 * pi * n1 * t / T)
-            + b4 * sin(2 * pi * n2 * t / T)
-            + a7 * cos(2 * pi * n3 * t / T)
-        )
-
-    N_chosen = 10
-    a0, a, b = fourier_series_coeff_numpy(f, T, N_chosen)
-
-    # we have as expected that
-    assert allclose(a0, 4)
-    assert allclose(a, [2, 0, 0, 0, 0, 0, -3, 0, 0, 0])
-    assert allclose(b, [0, 0, 0, -1, 0, 0, 0, 0, 0, 0])
-
-
-def test_taylor():
-    f = Taylor(0, [0, -.5, 0, 1])
-    f.plot((-8, 8))
-
-
-def test_fourier():
-    f = Fourier(0, [2 + i, 0, -1 - 2*i, 0, 1, 0, -1, i/2, 1, 0, 0, 0, 1, 0, i, i, i, 0], [])
-    f.plot((-8, 8))
-
-
-def inv_gauss():
-    """https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.invgauss.html"""
-    λ = 0.01
-    mu = 100
-
-    # x = np.linspace(invgauss.ppf(λ, mu), invgauss.ppf(0.95, mu), 100)
-
-    x = np.linspace(0, 10, 1_000)
-
-    plt.plot(x, invgauss.pdf(x, mu), 'r-', lw=1, alpha=0.6, label='invgauss pdf')
-    plt.show()
-
-
-def gen_inv_gaus():
-    """https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.geninvgauss.html#scipy.stats.geninvgauss"""
-    pass
-
-
-def make_hyd_dist(a: float, b: float) -> ndarray:
-    pass
-
-
-def hyd_dist():
-    """Use linear superpositions of variations of the n=1 (E=-1/2) solution of the 1D Hydrogen
-    atom to get solutions for higher n."""
-
-    # We're trying to replicate this:
-    n = 3
-    E = -2 / (n + 1) ** 2
-    x, ψ = h_static(E)
-
-    # By superimposing variants of n=1
-    n = 1
-    E = -2 / (n + 1) ** 2
-    x, ψ_working = h_static(E)
-
-    ψ_working *= -1
-
-    fig, ax = plt.subplots()
-
-    ax.plot(x, ψ)
-    ax.plot(x, ψ_working)
-
-    ax.grid(True)
-    plt.xlim(-10, 10)
-    plt.show()
-
-
 def check_wf_1d(x: ndarray, ψ: ndarray, E: float) -> ndarray:
     """Given a wave function as a set of discrete points, (Or a fn?) determine how much
     it close it is to the schrodinger equation by analyzing the derivatives.
     The result is a percent diff.
 
-    Check against ψ*() = -1/2 ψ''
+    ψ = -1/2ψ'' / (E-V)
     ψ = -1/2ψ'' / (E-1/abs(r))
+    or, reversed:
+    ψ'' = -2(E - 1/abs(r))ψ
     """
 
     # todo: Center it up? This approach lags.
@@ -393,24 +222,35 @@ def check_wf_1d(x: ndarray, ψ: ndarray, E: float) -> ndarray:
     ψ_pp = np.diff(np.diff(ψ)) / dx
     ψ_pp = np.append(ψ_pp, np.array([0, 0]))  # make the lengths match
 
-    plt.plot(x, ψ)
-    plt.plot(x, ψ_pp)
-    plt.xlim(0, 10)
-    plt.show()
+    ψ_pp_ideal = -2 * (E - 1/np.abs(x)) * ψ
+
+    # plt.plot(x, ψ)
+    # plt.plot(x, ψ_pp)
+    # plt.xlim(0, 10)
+    # plt.show()
 
     # For now, assume assume a single protein in the nucleus, at x=0.
 
     ψ_ideal = -1/2 * ψ_pp / (E - 1/np.abs(x))
 
-    result = (ψ - ψ_ideal) / ψ_ideal
+    # plt.plot(x, ψ_ideal)
+    # plt.plot(x, ψ)
+    # plt.xlim(0, 10)
+    # plt.show()
 
-    plt.plot(x, result)
+    plt.plot(x, ψ)
+    # plt.plot(x, ψ_pp_ideal)
     plt.xlim(0, 10)
     plt.show()
 
+    # result = (ψ - ψ_ideal) / ψ_ideal
+    result = (ψ_pp - ψ_pp_ideal) / ψ_pp_ideal
+
+    # plt.plot(x, result)
+    # plt.xlim(0, 10)
+    # plt.show()
+
     return result
-
-
 
 
 # def check_wf(ψ: Callable[(float, float), ]):
@@ -429,7 +269,7 @@ def run_check():
 
 
 if __name__ == "__main__":
-    # plot_h_static(1)
+    plot_h_static3d(3)
     # test_fft()
     # run_fft()
     # reimann()
@@ -438,4 +278,4 @@ if __name__ == "__main__":
     # inv_gauss()
     # h2()
 
-    run_check()
+    # run_check()

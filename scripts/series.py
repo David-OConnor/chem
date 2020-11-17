@@ -167,20 +167,23 @@ class Hydrogen:
 
         return result[0]
 
-    def plot(self, range_: Tuple[float, float] = (-20, 20), size: int = 10_000) -> None:
+    def value_comp(self, x: float, j: int) -> complex:
+        """Get a single value."""
+        return np.interp([x], self.x, self.components[j])[0]
 
+    def plot(self, range_: Tuple[float, float] = (-20, 20), shift: float = 0., size: int = 10_000, show: bool = True) -> None:
         ψ = np.zeros(len(self.x), dtype=np.complex128)
         for ψi in self.components:
             ψ += ψi
 
-
-
         # todo: DRY with other series'
-        plt.plot(self.x, np.conj(ψ.real) * ψ.real)
+        plt.plot(self.x + shift, ψ.real)
         # plt.plot(self.x, ψ.imag)
         # plt.xlim(range_[0], range_[1])
         plt.xlim(0, range_[1])
-        plt.show()
+
+        if show:
+            plt.show()
 
     def plot_2d(self) -> None:
         # The "blending" etc can be a periodic fn, like a sinusoid etc, over radials.
@@ -212,16 +215,21 @@ class Hydrogen:
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
 
+        N = 100
+
         # Create the mesh in polar coordinates and compute corresponding Z.
         # r = np.linspace(0, 1.25, 50)
-        r = np.linspace(0, 12, 100)
-        p = np.linspace(0, τ, 100)
+        r = np.linspace(0, 12, N)
+        p = np.linspace(0, τ, N)
 
         R, P = np.meshgrid(r, p)
 
-        Z = np.array([self.value(r) for r in R])
-        # Z *= sin(2*P)
-        Z = Z**2θ
+        Z = np.zeros([N, N])
+        # for j in range(len(self.components)):
+        Z += np.array([self.value_comp(r, 1) for r in R])# * cos(2*P)
+        Z += np.array([self.value_comp(r, 3) for r in R])# * cos(2*P)
+
+        Z = Z**2
 
         # Express the mesh in the cartesian system.
         X, Y = R * cos(P), R * sin(P)
@@ -244,6 +252,15 @@ class Hydrogen:
         # n=3, sin(θ): (3, 1, 0)
         # n=3, cos(θ): (3, 1, 1)
 
+        # Looks rightish, but need to verify:
+        # [0, 1, 0, 2], sin(1) : (2, 1, _)
+        # [0, 1, 0, -2], sin(1) all : (3, 1, _)
+        # [0, 1, 0, 2], sin(2) all : (3, 2, 1)
+        # [0, 1, 0, -2], sin(2) all : (4, 2, 1)
+        # [0, 1, 0, -2], sin(1) all : (4, 2, 1)
+        # [0, 2, 0, 1], sin(1) all : (2, 1, 0) ??
+
+
 
 def fourier_ode():
     """
@@ -256,3 +273,38 @@ def fourier_ode():
     rhs = lambda x, dx: dx
 
     f = FourierReal(0, [(1, 1), (1, 1), 2 * np.pi])
+
+
+def plot_multiple_h(comps: List[Tuple[List[complex], float]], range_: Tuple[float, float] = (-20, 20)) -> None:
+    """Comps is a list of Hydrogen series data/shifts"""
+
+    x = Hydrogen(comps[0][0]).x  # todo: awk/fallible
+    ψ = np.zeros(len(x), dtype=np.complex128)
+
+    for ser, shift in comps:
+        h = Hydrogen(ser)
+        # todo: Dry(plot)
+
+        ψj = np.zeros(len(x), dtype=np.complex128)
+        for ψi in h.components:
+            ψj += ψi
+
+        # convert our numerical shift to an index-based integer
+        dx = (x[-1] - x[0]) / x.size
+        shift_val = shift / dx
+        print(f"SF: {shift_val} dx: {dx}")
+        ψj = np.roll(ψj, int(shift_val))
+
+        ψ += ψj
+
+    plt.plot(x, ψ.real)
+    plt.xlim(range_[0], range_[1])
+
+    plt.show()
+
+
+if __name__ == "__main__":
+    plot_multiple_h([
+        ([0, 1, 0, 0], 10),
+        ([0, 1, 0, 0], -1),
+    ])
