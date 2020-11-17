@@ -7,7 +7,7 @@ from math import factorial
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
-from p1d import h_static
+from p1d import h_static, h_static_3d
 
 i = complex(0, 1)
 τ = 2 * π
@@ -144,11 +144,11 @@ class Hydrogen:
         self.coeffs = coeffs
         self.components = []
 
-        # n = 1   # todo: Only odd 1d coeffs for now.
-        n = 0   # todo: Only odd 1d coeffs for now.
-        for c in self.coeffs:
+        # n = 1
+        n = 0
+        for j, c in enumerate(self.coeffs):
             E = -2 / (n + 1) ** 2
-            x, ψ = h_static(E)
+            x, ψ = h_static_3d(E)
 
             # if n == 1:
             if n == 0:
@@ -167,37 +167,38 @@ class Hydrogen:
 
         return result[0]
 
-    def value_comp(self, x: float, j: int) -> complex:
+    def value_comp(self, x: np.ndarray, j: int) -> np.ndarray:
         """Get a single value."""
+
+        # Freeze values close to 0, to prevent asymptote from making vis unusable.
+        thresh = 1
+        for k in range(x.size):
+            if x[k] < thresh:
+                x[k] = thresh
+
         return np.interp([x], self.x, self.components[j])[0]
 
-    def plot(self, range_: Tuple[float, float] = (-20, 20), shift: float = 0., size: int = 10_000, show: bool = True) -> None:
+    def plot(self, range_: Tuple[float, float] = (0, 20), shift: float = 0., size: int = 10_000, show: bool = True) -> None:
         ψ = np.zeros(len(self.x), dtype=np.complex128)
         for ψi in self.components:
             ψ += ψi
 
+        fig, ax = plt.subplots()
+
         # todo: DRY with other series'
-        plt.plot(self.x + shift, ψ.real)
+        ax.plot(self.x + shift, ψ.real)
+        ax.grid(True)
+
         # plt.plot(self.x, ψ.imag)
         # plt.xlim(range_[0], range_[1])
         plt.xlim(0, range_[1])
+        plt.ylim(-0.02, 0.02)
 
         if show:
             plt.show()
 
     def plot_2d(self) -> None:
         # The "blending" etc can be a periodic fn, like a sinusoid etc, over radials.
-
-        # all 0 counts include the decay, and center.
-
-        # for 1D:
-        # n=0: start high, decay. Peaks: .15
-        # n=1: start 0, decay. Peaks: 1
-        # n=2: start high, cross once, decay. Peaks: .1, 2.7
-        # n=3: Start 0, cross once, decay. Peaks: .76, 5.23
-        # n=4: Start high, cross 2x, decay
-        # n=5: Start 0, cross 2x, decay. Peaks: .74, 4.18, 13
-        # n=6: start high: cross 3x, decay
 
         # Let n be odd only: (n+1)/2 + 1 = num zeros.
 
@@ -261,6 +262,64 @@ class Hydrogen:
         # [0, 2, 0, 1], sin(1) all : (2, 1, 0) ??
 
 
+@dataclass
+class Hydrogen3D:
+    """Experimental 3d series"""
+    # todo: Or is it n = 1, 3, 5...
+    # coeffs: List[complex]  # Positive coefficients: n = 0, 1, 2, 3...
+
+    n: int
+    l: int
+    m: int
+
+    x: np.ndarray
+    components: List[np.ndarray]
+
+    def __init__(self, coeffs: List[complex]):
+        self.coeffs = coeffs
+        self.components = []
+
+        # n = 1   # todo: Only odd 1d coeffs for now.
+        n = 0   # todo: Only odd 1d coeffs for now.
+        for c in self.coeffs:
+            E = -2 / (n + 1) ** 2
+            x, ψ = h_static(E)
+
+            # if n == 1:
+            if n == 0:
+                self.x = x
+
+            self.components.append(c * ψ)
+
+            # n += 2
+            n += 1
+
+    def value(self, r: float, θ: float, φ: float) -> complex:
+        """Get a single value."""
+        result = 0
+        for comp in self.components:
+            result += np.interp([x], self.x, comp)
+
+        return result[0]
+
+    def value_comp(self, x: float, j: int) -> complex:
+        """Get a single value."""
+        return np.interp([x], self.x, self.components[j])[0]
+
+    def plot(self, range_: Tuple[float, float] = (-20, 20), shift: float = 0., size: int = 10_000, show: bool = True) -> None:
+        ψ = np.zeros(len(self.x), dtype=np.complex128)
+        for ψi in self.components:
+            ψ += ψi
+
+        # todo: DRY with other series'
+        plt.plot(self.x + shift, ψ.real)
+        # plt.plot(self.x, ψ.imag)
+        # plt.xlim(range_[0], range_[1])
+        plt.xlim(0, range_[1])
+
+        if show:
+            plt.show()
+
 
 def fourier_ode():
     """
@@ -304,7 +363,10 @@ def plot_multiple_h(comps: List[Tuple[List[complex], float]], range_: Tuple[floa
 
 
 if __name__ == "__main__":
-    plot_multiple_h([
-        ([0, 1, 0, 0], 10),
-        ([0, 1, 0, 0], -1),
-    ])
+    # n=         1     2     3
+    Hydrogen([0, 0, 0, 0, 0, 1]).plot_2d()
+
+    # plot_multiple_h([
+    #     ([0, 1, 0, 0], 10),
+    #     ([0, 1, 0, 0], -1),
+    # ])

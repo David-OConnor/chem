@@ -66,6 +66,8 @@ V_prev: Callable = lambda sx: 0
 # Free variables: 2? Energy, and ψ_p_0(ψ). Eg we can set ψ to what we wish, find the ψ_p that
 # works with it (and the E set), then normalize.
 
+PRECISION = 100_000
+
 
 @dataclass
 class Nucleus:
@@ -111,15 +113,14 @@ def solve(E: float, V: Callable, ψ0: float, ψ_p0: float, x_span: Tuple[float, 
     """
     rhs = partial(ti_schrod_rhs, E, V)
     return solve_ivp(
-        rhs, x_span, (ψ0, ψ_p0), t_eval=np.linspace(x_span[0], x_span[1], 10000)
+        rhs, x_span, (ψ0, ψ_p0), t_eval=np.linspace(x_span[0], x_span[1], PRECISION)
     )
 
 
-def h_static(E: float) -> Tuple[ndarray, ndarray]:
+def h_static(E: float, normalize=True) -> Tuple[ndarray, ndarray]:
     ψ0 = 0
-    ψ_p0 = 1
+    ψ_p0 = 0.1
     x_span = (-100, 0.0000001)
-    # x_span = (.000001, 1)
 
     V_elec = partial(nuc_pot, [Nucleus(1, 0, 0, 0)])
     # V_elec = partial(nuc_pot, [Nucleus(1, 0, 0, 0), Nucleus(1, 0, 1, 0)])
@@ -131,8 +132,50 @@ def h_static(E: float) -> Tuple[ndarray, ndarray]:
     soln = np.concatenate([soln_left, -soln_right])
     x = np.concatenate([soln_orig.t, np.flip(-soln_orig.t)])
 
-    norm = simps(np.conj(soln) * soln, x=x)
-    return x, soln / norm ** 0.5
+    if normalize:
+        norm = simps(np.conj(soln) * soln, x=x)
+        return x, soln / norm ** 0.5
+
+    return x, soln
+
+
+def h_static_3d(E: float, normalize=False) -> Tuple[ndarray, ndarray]:
+    """We create the radial part of the 3d version from the "radial density" information."""
+    # todo: Why don't we get a result if we fail to normalize here?
+    # Normalize the radial part, not the whole thing; this gives us reasonable values,
+    # without dealing with the asymptote near the origin.
+    r, ψ = h_static(E, normalize=True)
+    ψ = sqrt(ψ**2 / r**2)
+
+    # Post-process by flipping between 0s, to make up for info lost
+    # during square root.
+    ε = 1e-3  # thresh for hit a 0.
+    ψ_processed = np.copy(ψ)
+    in_inversion = False
+    slope_neg_prev = True
+
+    for j in range(ψ.size):
+        if j == 0:  # We use slopes; don't mis-index
+            ψ_processed[j] = ψ[j]
+            continue
+
+        slope_neg = ψ[j] < ψ[j-1]
+
+        # Just started or ended an inversion.
+        if ψ[j] <= ε and slope_neg != slope_neg_prev:
+            in_inversion = not in_inversion
+
+        if in_inversion:
+            ψ_processed[j] = -ψ[j]
+        else:
+            ψ_processed[j] = ψ[j]
+
+        slope_neg_prev = slope_neg
+
+    if normalize:
+        norm = simps(np.conj(ψ_processed) * ψ_processed, x=r)
+        return r, ψ_processed / norm ** 0.5
+    return r, ψ_processed
 
 
 def plot_h_static(n: int = 1):
@@ -153,34 +196,18 @@ def plot_h_static(n: int = 1):
     plt.show()
 
 
-def plot_h_static3d(n: int = 1):
+def plot_h_static_3d(n: int = 1):
     """Like H static, but perhaps this is the right model for 3D."""
+    # todo: Major DRY
     E = -2 / (n + 1) ** 2
-    x, ψ = h_static(E)
-
-    ψ = sqrt(ψ**2 / x**2)
-
-    # Post-process by flipping between 0s, to make up for info lost
-    # during square root.
-    ε = 1e-5  # thresh for hit a 0.
-    ψ_processed = ψ
-    in_inversion = False
-
-    for j in range(ψ.size):
-        if ψ[j] <= ε:
-            in_inversion = not in_inversion
-
-        if in_inversion:
-            ψ_processed[j] = -ψ[j]
-        else:
-            ψ_processed[j] = ψ[j]
+    x, ψ = h_static_3d(E)
 
     fig, ax = plt.subplots()
     ax.plot(x, ψ)
 
     ax.grid(True)
-    plt.xlim(-10, 10)
-    plt.ylim(-3, 3)
+    plt.xlim(0, 20)
+    plt.ylim(-0.02, 0.02)
     plt.show()
 
 
@@ -269,7 +296,12 @@ def run_check():
 
 
 if __name__ == "__main__":
-    plot_h_static3d(3)
+    n = 3
+    plot_h_static_3d(2*n - 1)
+    # plot_h_static(1)
+    # plot_h_static_3d(2)
+    # plot_h_static(5)
+
     # test_fft()
     # run_fft()
     # reimann()

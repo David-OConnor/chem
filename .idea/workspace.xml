@@ -347,7 +347,7 @@
       <workItem from="1604148541346" duration="1203000" />
       <workItem from="1604346745472" duration="663000" />
       <workItem from="1605140043459" duration="3714000" />
-      <workItem from="1605179174125" duration="9547000" />
+      <workItem from="1605179174125" duration="17571000" />
     </task>
     <servers />
   </component>
@@ -375,6 +375,10 @@
       <screen x="0" y="0" width="3440" height="1400" />
     </state>
     <state x="850" y="585" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.3440.1400@0.0.3440.1400" timestamp="1602474576491" />
+    <state x="1893" y="339" width="672" height="678" key="search.everywhere.popup" timestamp="1605624474395">
+      <screen x="0" y="0" width="3440" height="1400" />
+    </state>
+    <state x="1893" y="339" width="672" height="678" key="search.everywhere.popup/0.0.3440.1400@0.0.3440.1400" timestamp="1605624474395" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
