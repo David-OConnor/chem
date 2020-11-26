@@ -187,12 +187,13 @@ def plot_h_static(n: int = 1):
     # Only odd states (n = 1, 3, 5 etc) correspond to 3d H atom.
     E = -2 / (n + 1) ** 2
     x, ψ = h_static(E)
+    ψ = ψ**2
 
     fig, ax = plt.subplots()
     ax.plot(x, ψ)
 
     ax.grid(True)
-    plt.xlim(-20, 20)
+    plt.xlim(0, 20)
     plt.show()
 
 
@@ -295,10 +296,42 @@ def run_check():
     print(check_wf_1d(x, ψ, E))
 
 
+def calc_energy(n: int) -> float:
+    """Numerically calculate the energy of a wave function generated
+    by `h_static`. For n=1, we'd like to see if we can back-calculate E = -1/2."""
+    E = -2 / (n + 1) ** 2
+    x, ψ = h_static(E)
+
+    # Calculate potential between the e- field and the nucleus point by integrating.
+    # todo: Let's do this manually first, then try to apply a scipy.integrate approach.
+
+    dx = 1
+
+    result = 0
+
+    ψ2 = np.conj(ψ) * ψ
+
+    sample_pts = np.arange(x[0], x[-1], dx)
+    for pt in sample_pts:
+        k = 1
+        Q = 1
+        V = k * Q / x
+
+        q = 1
+        E = V * q * np.interp([pt], x, ψ2)[0]
+
+        result += E / dx
+
+    return result
+
+
 if __name__ == "__main__":
-    n = 3
-    plot_h_static_3d(2*n - 1)
+    n = 1
+    # plot_h_static_3d(2*n - 1)
     # plot_h_static(1)
+
+    print(calc_energy(n))
+
     # plot_h_static_3d(2)
     # plot_h_static(5)
 
