@@ -3,8 +3,6 @@ from scipy.integrate import solve_ivp, simps
 from scipy.fft import fft
 from scipy.stats import invgauss#, invgauss_gen
 
-from consts import *
-
 from functools import partial
 from typing import List, Iterable, Callable, Tuple
 
@@ -15,7 +13,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
 
-# from series import Fourier, Taylor
+from series import Hydrogen3d
+from consts import *
+import consts
 
 τ = 2 * np.pi
 i = complex(0, 1)
@@ -40,6 +40,13 @@ offset in x) that create the H2 molecular orbitals. These orbitals you're attemp
 match can be taken from real data, or by integrating. (May need to break up integration
 into three areas, to avoid singularities at each nucleus).
 """
+
+
+@dataclass
+class Pt:
+    x: float
+    y: float
+    z: float
 
 
 matplotlib.use("Qt5Agg")
@@ -212,26 +219,6 @@ def plot_h_static_3d(n: int = 1):
     plt.show()
 
 
-def reimann():
-    n = 1
-    E = -2 / (n + 1) ** 2
-    x, ψ = h_static(E)
-
-    ψ = ψ.astype(np.complex128)
-
-    x = np.linspace(-10, 10, x.size, dtype=np.complex128)
-    ψ = np.zeros(len(x), dtype=np.complex128)
-    ψ += exp(1 * i * x)  # this should give us 0, [1], [0]
-
-    fig, ax = plt.subplots()
-    ax.plot(x, result)
-    ax.grid(True)
-    # plt.xlim(-10, 10)
-    plt.show()
-
-    return result
-
-
 def check_wf_1d(x: ndarray, ψ: ndarray, E: float) -> ndarray:
     """Given a wave function as a set of discrete points, (Or a fn?) determine how much
     it close it is to the schrodinger equation by analyzing the derivatives.
@@ -323,6 +310,47 @@ def calc_energy(n: int) -> float:
         result += E / dx
 
     return result
+
+
+def h2_potential(x: float) -> float:
+    """Calcualte the electric potential between 2 hydrogen atoms"""
+
+    # Start with the perspectic of one atom. Calculate the interaction between
+    # its nucleus and the other atom's nucleus, and electron.
+
+    # Our convention will be attraction is positive potential.
+    n = 1
+    E = -2 / (n + 1) ** 2
+    H = Hydrogen3d([0, 1])
+
+    nuc_nuc_V = consts.k * consts.e**2 / x
+
+    dx = 0.1
+    dv = dx**3
+
+    nuc_elec_V = 0
+
+    # We'll say the molecules are at the same z and y coordinates,
+    # but separated on the x axis by input argument `x`.
+    # Sample point coordinates are centered on the non-POV atom.
+
+    N = 10
+    sample_pts = []
+    for j in N:
+        for k in N:
+            for l in N:
+                sample_pts.append(Pt())
+
+
+    for pt in sample_pts:
+        # We need to integrate over volume, eg by splitting up into
+        # small cubes.
+
+        # Offset the x value by the distance between nuclei.
+        r = sqrt((pt.x - x)**2 + pt.y**2 + pt.z**2)
+        elec_val = H.value(r, 0, 0) * dv
+
+        nuc_elec_V = consts.k * consts.e * e_val / x
 
 
 if __name__ == "__main__":

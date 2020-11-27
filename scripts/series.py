@@ -10,7 +10,7 @@ from mpl_toolkits.mplot3d import Axes3D
 from p1d import h_static, h_static_3d
 
 i = complex(0, 1)
-τ = 2 *
+τ = 2 * π
 
 # todo: See if you can get actual distance of h2 atoms.
 
@@ -140,202 +140,202 @@ class Taylor:
 # todo the coefficients to produce (2d for now )wfs? Start with just a single H atom.
 # ns: Just rotate the [n, 0...] around with no modifications.
 
+# @dataclass
+# class Hydrogen:
+#     """A series using s=0 hydrogen atom wavefunctions at different energy levels."""
+#     # todo: Or is it n = 1, 3, 5...
+#     coeffs: List[complex]  # Positive coefficients: n = 0, 1, 2, 3...
+#
+#     x: np.ndarray
+#     components: List[np.ndarray]
+#
+#     def __init__(self, coeffs: List[complex]):
+#         self.coeffs = coeffs
+#         self.components = []
+#
+#         # n = 1
+#         n = 0
+#         for j, c in enumerate(self.coeffs):
+#             E = -2 / (n + 1) ** 2
+#             x, ψ = h_static_3d(E)
+#
+#             # if n == 1:
+#             if n == 0:
+#                 self.x = x
+#
+#             self.components.append(c * ψ)
+#
+#             # n += 2
+#             n += 1
+#
+#     def value(self, x: float) -> complex:
+#         """Get a single value."""
+#         result = 0
+#         for comp in self.components:
+#             result += np.interp([x], self.x, comp)[0]
+#
+#         return result
+#
+#     def value_comp(self, x: np.ndarray, j: int) -> np.ndarray:
+#         """Get a single value, from a specific component."""
+#
+#         # Freeze values close to 0, to prevent asymptote from making vis unusable.
+#         # vals = np.copy(self.components[j])
+#         # thresh_x = 0.5
+#         # thresh_val = np.interp([thresh_x], self.x, vals)[0]
+#         #
+#         # for k in range(self.x.size):
+#         #     if self.x[k] < thresh_x:
+#         #         vals[k] = thresh_val
+#
+#         # return np.interp([x], self.x, vals)[0]
+#         return np.interp([x], self.x, self.components[j])[0]
+#
+#     def plot(self, range_: Tuple[float, float] = (0, 20), shift: float = 0., size: int = 10_000, show: bool = True) -> None:
+#         ψ = np.zeros(len(self.x), dtype=np.complex128)
+#         for ψi in self.components:
+#             ψ += ψi
+#
+#         fig, ax = plt.subplots()
+#
+#         # todo: DRY with other series'
+#         ax.plot(self.x + shift, ψ.real)
+#         ax.grid(True)
+#
+#         # plt.plot(self.x, ψ.imag)
+#         # plt.xlim(range_[0], range_[1])
+#         plt.xlim(0, range_[1])
+#         plt.ylim(-0.02, 0.02)
+#
+#         if show:
+#             plt.show()
+#
+#     def plot_2d(self) -> None:
+#         # The "blending" etc can be a periodic fn, like a sinusoid etc, over radials.
+#
+#         # Let n be odd only: (n+1)/2 + 1 = num zeros.
+#
+#         # good diagrams:
+#         # https://en.wikipedia.org/wiki/Atomic_orbital
+#
+#         # todo: Start with n=2, and a sin wave of amplitude
+#         fig = plt.figure(figsize=(10, 10))
+#         ax = fig.add_subplot(111, projection='3d')
+#
+#         N = 150
+#
+#         # Create the mesh in polar coordinates and compute corresponding Z.
+#
+#         # Example r ranges for useful visualization:
+#         # n = 1: 10
+#         # n = 2: 15
+#         # n = 3: 30
+#
+#         r = np.linspace(0, 15, N)
+#         p = np.linspace(0, τ, N)
+#
+#         R, P = np.meshgrid(r, p)
+#
+#         Z = np.zeros([N, N])
+#         # for j in range(len(self.components)):
+#         #     Z += np.array([self.value_comp(r, j) for r in R])
+#
+#         Z += np.array([self.value_comp(r, 1) for r in R]) * sin(P)
+#         Z += np.array([self.value_comp(r, 3) for r in R]) * sin(P)
+#         Z += np.array([self.value_comp(r, 5) for r in R]) * sin(P)
+#
+#         # Don't let center asymptote cause a spike.
+#         print(Z.shape)
+#         thresh_val = 0.1
+#         for j in range(Z.shape[0]):
+#             for k in range(Z.shape[1]):
+#                 if np.abs(Z[j][k]) > thresh_val:
+#                     if Z[j][k] >= 0:
+#                         Z[j][k] = thresh_val
+#                     else:
+#                         Z[j][k] = -thresh_val
+#
+#         Z = Z**2  # Uncomment to square the WF.
+#
+#         # Express the mesh in the cartesian system.
+#         X, Y = R * cos(P), R * sin(P)
+#
+#         # Plot the surface.
+#         ax.plot_surface(X, Y, Z, cmap=plt.cm.YlGnBu_r)
+#
+#         # Tweak the limits and add latex math labels.
+#         ax.set_zlim(0, 0.4)
+#         ax.set_xlabel(r'$x$')
+#         ax.set_ylabel(r'$y$')
+#         ax.set_zlabel(r'$\psi$')
+#         ax.grid(False)
+#
+#         plt.show()
+#
+#         # Reproducing Hydrogen orbitals. 2D for now.
+#         # Since we're plotting in 2D, we leave out some Ms, since they're rotations
+#         # in a non-applicable plane.
+#
+#         # Legend
+#         # (n, l, m): n, modifier 1, modifier 2
+#
+#         # S:
+#         # (n, 0, 0): n, None, None
+#
+#         # P:
+#         # (2, 1, 0): n, no modification
+#         # (3, 1, 1): n, no modification
+#
+#         # D:
+#         # (3, 2, 0): n, no modification
+#         # (4, 2, 1): n, no modification
+#         # (5, 2, 2): n, no modification
+#
+#
+# def plot_2d(self) -> None:
+#     """An attempt to visualize 3D WFs by scatter density/color plots."""
+#
+#     # todo: Start with n=2, and a sin wave of amplitude
+#     fig = plt.figure(figsize=(10, 10))
+#     ax = fig.add_subplot(111, projection='3d')
+#
+#     N = 150
+#
+#     # Create the mesh in polar coordinates and compute corresponding Z.
+#
+#     # Example r ranges for useful visualization:
+#     # n = 1: 10
+#     # n = 2: 15
+#     # n = 3: 30
+#
+#     r = np.linspace(0, 15, N)
+#     p = np.linspace(0, τ, N)
+#
+#     R, P = np.meshgrid(r, p)
+#
+#     Z = np.zeros([N, N])
+#     for j in range(len(self.components)):
+#         Z += np.array([self.value_comp(r, j) for r in R])
+#
+#     # Express the mesh in the cartesian system.
+#     X, Y = R * cos(P), R * sin(P)
+#
+#     # Plot the surface.
+#     ax.plot_surface(X, Y, Z, cmap=plt.cm.YlGnBu_r)
+#
+#     # Tweak the limits and add latex math labels.
+#     ax.set_zlim(0, 0.4)
+#     ax.set_xlabel(r'$x$')
+#     ax.set_ylabel(r'$y$')
+#     ax.set_zlabel(r'$\psi$')
+#     ax.grid(False)
+#
+#     plt.show()
+#
+
 @dataclass
-class Hydrogen:
-    """A series using s=0 hydrogen atom wavefunctions at different energy levels."""
-    # todo: Or is it n = 1, 3, 5...
-    coeffs: List[complex]  # Positive coefficients: n = 0, 1, 2, 3...
-
-    x: np.ndarray
-    components: List[np.ndarray]
-
-    def __init__(self, coeffs: List[complex]):
-        self.coeffs = coeffs
-        self.components = []
-
-        # n = 1
-        n = 0
-        for j, c in enumerate(self.coeffs):
-            E = -2 / (n + 1) ** 2
-            x, ψ = h_static_3d(E)
-
-            # if n == 1:
-            if n == 0:
-                self.x = x
-
-            self.components.append(c * ψ)
-
-            # n += 2
-            n += 1
-
-    def value(self, x: float) -> complex:
-        """Get a single value."""
-        result = 0
-        for comp in self.components:
-            result += np.interp([x], self.x, comp)[0]
-
-        return result
-
-    def value_comp(self, x: np.ndarray, j: int) -> np.ndarray:
-        """Get a single value, from a specific component."""
-
-        # Freeze values close to 0, to prevent asymptote from making vis unusable.
-        # vals = np.copy(self.components[j])
-        # thresh_x = 0.5
-        # thresh_val = np.interp([thresh_x], self.x, vals)[0]
-        #
-        # for k in range(self.x.size):
-        #     if self.x[k] < thresh_x:
-        #         vals[k] = thresh_val
-
-        # return np.interp([x], self.x, vals)[0]
-        return np.interp([x], self.x, self.components[j])[0]
-
-    def plot(self, range_: Tuple[float, float] = (0, 20), shift: float = 0., size: int = 10_000, show: bool = True) -> None:
-        ψ = np.zeros(len(self.x), dtype=np.complex128)
-        for ψi in self.components:
-            ψ += ψi
-
-        fig, ax = plt.subplots()
-
-        # todo: DRY with other series'
-        ax.plot(self.x + shift, ψ.real)
-        ax.grid(True)
-
-        # plt.plot(self.x, ψ.imag)
-        # plt.xlim(range_[0], range_[1])
-        plt.xlim(0, range_[1])
-        plt.ylim(-0.02, 0.02)
-
-        if show:
-            plt.show()
-
-    def plot_2d(self) -> None:
-        # The "blending" etc can be a periodic fn, like a sinusoid etc, over radials.
-
-        # Let n be odd only: (n+1)/2 + 1 = num zeros.
-
-        # good diagrams:
-        # https://en.wikipedia.org/wiki/Atomic_orbital
-
-        # todo: Start with n=2, and a sin wave of amplitude
-        fig = plt.figure(figsize=(10, 10))
-        ax = fig.add_subplot(111, projection='3d')
-
-        N = 150
-
-        # Create the mesh in polar coordinates and compute corresponding Z.
-
-        # Example r ranges for useful visualization:
-        # n = 1: 10
-        # n = 2: 15
-        # n = 3: 30
-
-        r = np.linspace(0, 15, N)
-        p = np.linspace(0, τ, N)
-
-        R, P = np.meshgrid(r, p)
-
-        Z = np.zeros([N, N])
-        # for j in range(len(self.components)):
-        #     Z += np.array([self.value_comp(r, j) for r in R])
-
-        Z += np.array([self.value_comp(r, 1) for r in R]) * sin(P)
-        Z += np.array([self.value_comp(r, 3) for r in R]) * sin(P)
-        Z += np.array([self.value_comp(r, 5) for r in R]) * sin(P)
-
-        # Don't let center asymptote cause a spike.
-        print(Z.shape)
-        thresh_val = 0.1
-        for j in range(Z.shape[0]):
-            for k in range(Z.shape[1]):
-                if np.abs(Z[j][k]) > thresh_val:
-                    if Z[j][k] >= 0:
-                        Z[j][k] = thresh_val
-                    else:
-                        Z[j][k] = -thresh_val
-
-        Z = Z**2  # Uncomment to square the WF.
-
-        # Express the mesh in the cartesian system.
-        X, Y = R * cos(P), R * sin(P)
-
-        # Plot the surface.
-        ax.plot_surface(X, Y, Z, cmap=plt.cm.YlGnBu_r)
-
-        # Tweak the limits and add latex math labels.
-        ax.set_zlim(0, 0.4)
-        ax.set_xlabel(r'$x$')
-        ax.set_ylabel(r'$y$')
-        ax.set_zlabel(r'$\psi$')
-        ax.grid(False)
-
-        plt.show()
-
-        # Reproducing Hydrogen orbitals. 2D for now.
-        # Since we're plotting in 2D, we leave out some Ms, since they're rotations
-        # in a non-applicable plane.
-
-        # Legend
-        # (n, l, m): n, modifier 1, modifier 2
-
-        # S:
-        # (n, 0, 0): n, None, None
-
-        # P:
-        # (2, 1, 0): n, no modification
-        # (3, 1, 1): n, no modification
-
-        # D:
-        # (3, 2, 0): n, no modification
-        # (4, 2, 1): n, no modification
-        # (5, 2, 2): n, no modification
-
-
-def plot_2d(self) -> None:
-    """An attempt to visualize 3D WFs by scatter density/color plots."""
-
-    # todo: Start with n=2, and a sin wave of amplitude
-    fig = plt.figure(figsize=(10, 10))
-    ax = fig.add_subplot(111, projection='3d')
-
-    N = 150
-
-    # Create the mesh in polar coordinates and compute corresponding Z.
-
-    # Example r ranges for useful visualization:
-    # n = 1: 10
-    # n = 2: 15
-    # n = 3: 30
-
-    r = np.linspace(0, 15, N)
-    p = np.linspace(0, τ, N)
-
-    R, P = np.meshgrid(r, p)
-
-    Z = np.zeros([N, N])
-    for j in range(len(self.components)):
-        Z += np.array([self.value_comp(r, j) for r in R])
-
-    # Express the mesh in the cartesian system.
-    X, Y = R * cos(P), R * sin(P)
-
-    # Plot the surface.
-    ax.plot_surface(X, Y, Z, cmap=plt.cm.YlGnBu_r)
-
-    # Tweak the limits and add latex math labels.
-    ax.set_zlim(0, 0.4)
-    ax.set_xlabel(r'$x$')
-    ax.set_ylabel(r'$y$')
-    ax.set_zlabel(r'$\psi$')
-    ax.grid(False)
-
-    plt.show()
-
-
-@dataclass
-class Hydrogen3D:
-    """Experimental 3d series"""
+class Hydrogen3d:
+    """A Hydrogen 3d superposition"""
     # todo: Or is it n = 1, 3, 5...
     # coeffs: List[complex]  # Positive coefficients: n = 0, 1, 2, 3...
 
@@ -354,7 +354,7 @@ class Hydrogen3D:
         n = 0   # todo: Only odd 1d coeffs for now.
         for c in self.coeffs:
             E = -2 / (n + 1) ** 2
-            x, ψ = h_static(E)
+            x, ψ = h_static_3d(E)
 
             # if n == 1:
             if n == 0:
@@ -408,11 +408,11 @@ def fourier_ode():
 def plot_multiple_h(comps: List[Tuple[List[complex], float]], range_: Tuple[float, float] = (-20, 20)) -> None:
     """Comps is a list of Hydrogen series data/shifts"""
 
-    x = Hydrogen(comps[0][0]).x  # todo: awk/fallible
+    x = Hydrogen3d(comps[0][0]).x  # todo: awk/fallible
     ψ = np.zeros(len(x), dtype=np.complex128)
 
     for ser, shift in comps:
-        h = Hydrogen(ser)
+        h = Hydrogen3d(ser)
         # todo: Dry(plot)
 
         ψj = np.zeros(len(x), dtype=np.complex128)
