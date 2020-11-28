@@ -1,2 +1,2 @@
-from . import p1d
+from . import main
 from archive import p2d, p3d

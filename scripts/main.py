@@ -13,7 +13,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
 
-from series import Hydrogen3d
 from consts import *
 import consts
 
@@ -40,6 +39,66 @@ offset in x) that create the H2 molecular orbitals. These orbitals you're attemp
 match can be taken from real data, or by integrating. (May need to break up integration
 into three areas, to avoid singularities at each nucleus).
 """
+
+
+@dataclass
+class Hydrogen3d:
+    """A Hydrogen 3d superposition"""
+    # todo: Or is it n = 1, 3, 5...
+    # coeffs: List[complex]  # Positive coefficients: n = 0, 1, 2, 3...
+
+    n: int
+    l: int
+    m: int
+
+    x: np.ndarray
+    components: List[np.ndarray]
+
+    def __init__(self, coeffs: List[complex]):
+        self.coeffs = coeffs
+        self.components = []
+
+        # n = 1   # todo: Only odd 1d coeffs for now.
+        n = 0   # todo: Only odd 1d coeffs for now.
+        for c in self.coeffs:
+            E = -2 / (n + 1) ** 2
+            x, ψ = h_static_3d(E)
+
+            # if n == 1:
+            if n == 0:
+                self.x = x
+
+            self.components.append(c * ψ)
+
+            # n += 2
+            n += 1
+
+    def value(self, r: float, θ: float, φ: float) -> complex:
+        """Get a single value."""
+        result = 0
+        for comp in self.components:
+            result += np.interp([r], self.x, comp)[0]
+
+        return result
+
+    def value_comp(self, x: float, j: int) -> complex:
+        """Get a single value, from a specific component."""
+        return np.interp([x], self.x, self.components[j])[0]
+
+    def plot(self, range_: Tuple[float, float] = (-20, 20), shift: float = 0., size: int = 10_000, show: bool = True) -> None:
+        ψ = np.zeros(len(self.x), dtype=np.complex128)
+        for ψi in self.components:
+            ψ += ψi
+
+        # todo: DRY with other series'
+        plt.plot(self.x + shift, ψ.real)
+        # plt.plot(self.x, ψ.imag)
+        # plt.xlim(range_[0], range_[1])
+        plt.xlim(0, range_[1])
+
+        if show:
+            plt.show()
+
 
 
 @dataclass
@@ -334,33 +393,66 @@ def h2_potential(x: float) -> float:
     # but separated on the x axis by input argument `x`.
     # Sample point coordinates are centered on the non-POV atom.
 
-    N = 10
-    sample_pts = []
-    for j in N:
-        for k in N:
-            for l in N:
-                sample_pts.append(Pt())
+    # todo: You will gain much precision by taking sample areas
+    # todo closer together near the nucleus
 
+    # `sample_range` applies to all 3 dimensions.
+    sample_range = np.arange(-30, 30, dx)
+
+    sample_pts = []
+    for j in range(sample_range.size):
+        for k_ in range(sample_range.size):
+            for l in range(sample_range.size):
+                sample_pts.append(Pt(j, k_, l))
+
+    # sample_pts = sample_range  # 1d
+
+    print("num samples: ", len(sample_pts))
 
     for pt in sample_pts:
         # We need to integrate over volume, eg by splitting up into
         # small cubes.
 
         # Offset the x value by the distance between nuclei.
-        r = sqrt((pt.x - x)**2 + pt.y**2 + pt.z**2)
-        elec_val = H.value(r, 0, 0) * dv
+        r = sqrt((pt.x + x)**2 + pt.y**2 + pt.z**2)
 
-        nuc_elec_V = consts.k * consts.e * e_val / x
+        ψ_local = H.value(r, 0, 0)
 
+        # Divide by the number of sample points: The total answer
+        # ψ^2 adds up to 1, so this weights each segment evenly.
+        elec_val = np.conj(ψ_local) * ψ_local
+
+        # 2 for both interactions
+        nuc_elec_V -= 2 * consts.k * consts.e * elec_val / pt.x * dv
+
+    elec_elec_V = 0
+    e_e_factor = len(sample_pts)**2
+    for pt0 in sample_pts:
+        r0 = sqrt(pt0.x ** 2 + pt0.y ** 2 + pt0.z ** 2)
+        ψ_local0 = H.value(r0, 0, 0)
+        for pt1 in sample_pts:
+            # todo: We only need to calculate wfs for each pt once!
+            # todo: Current approach could slow it down
+            r1 = sqrψ_local0t((pt1.x)**2 + pt1.y**2 + pt1.z**2)
+            ψ_local1 = H.value(r1, 0, 0)
+
+            # These are localized for each pt.
+            dist = sqrt((pt1.x - pt0.x)**2 + (pt1.y - pt1.y)**2 + (pt1.z - pt0.z)**2)
+
+            elec_elec_V += consts.k * consts.e * ψ_local0 * ψ_local1 / dist * dv
+
+            elec_val = np.conj(ψ_local) * ψ_local / e_e_factor
+
+
+    print(f"NN: {nuc_nuc_V}, NE: {nuc_elec_V}, EE: {elec_elec_V} Net: {nuc_nuc_V + nuc_elec_V + elec_elec_V}")
 
 if __name__ == "__main__":
     n = 1
-    # plot_h_static_3d(2*n - 1)
-    # plot_h_static(1)
 
-    print(calc_energy(n))
+    # print(calc_energy(n))
 
-    # plot_h_static_3d(2)
+    h2_potential(1)
+    plot_h_static_3d(n)
     # plot_h_static(5)
 
     # test_fft()

@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.integrate import simps
 
-from .p1d import Nucleus, nuc_pot, solve
+from .main import Nucleus, nuc_pot, solve
 
 ATOM_ARR_LEN = 5
 

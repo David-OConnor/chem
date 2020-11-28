@@ -7,7 +7,7 @@ from math import factorial
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
-from p1d import h_static, h_static_3d
+from main import h_static, h_static_3d
 
 i = complex(0, 1)
 τ = 2 * π
@@ -332,64 +332,6 @@ class Taylor:
 #
 #     plt.show()
 #
-
-@dataclass
-class Hydrogen3d:
-    """A Hydrogen 3d superposition"""
-    # todo: Or is it n = 1, 3, 5...
-    # coeffs: List[complex]  # Positive coefficients: n = 0, 1, 2, 3...
-
-    n: int
-    l: int
-    m: int
-
-    x: np.ndarray
-    components: List[np.ndarray]
-
-    def __init__(self, coeffs: List[complex]):
-        self.coeffs = coeffs
-        self.components = []
-
-        # n = 1   # todo: Only odd 1d coeffs for now.
-        n = 0   # todo: Only odd 1d coeffs for now.
-        for c in self.coeffs:
-            E = -2 / (n + 1) ** 2
-            x, ψ = h_static_3d(E)
-
-            # if n == 1:
-            if n == 0:
-                self.x = x
-
-            self.components.append(c * ψ)
-
-            # n += 2
-            n += 1
-
-    def value(self, r: float, θ: float, φ: float) -> complex:
-        """Get a single value."""
-        result = 0
-        for comp in self.components:
-            result += np.interp([r], self.x, comp)[0]
-
-        return result
-
-    def value_comp(self, x: float, j: int) -> complex:
-        """Get a single value, from a specific component."""
-        return np.interp([x], self.x, self.components[j])[0]
-
-    def plot(self, range_: Tuple[float, float] = (-20, 20), shift: float = 0., size: int = 10_000, show: bool = True) -> None:
-        ψ = np.zeros(len(self.x), dtype=np.complex128)
-        for ψi in self.components:
-            ψ += ψi
-
-        # todo: DRY with other series'
-        plt.plot(self.x + shift, ψ.real)
-        # plt.plot(self.x, ψ.imag)
-        # plt.xlim(range_[0], range_[1])
-        plt.xlim(0, range_[1])
-
-        if show:
-            plt.show()
 
 
 def fourier_ode():

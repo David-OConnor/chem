@@ -23,17 +23,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="63843798-86fc-4cf6-9df5-0d52eff0dddc" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/chem.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/chem.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pyflow.lock" beforeDir="false" afterPath="$PROJECT_DIR$/pyflow.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pyproject.toml" beforeDir="false" afterPath="$PROJECT_DIR$/pyproject.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/1d_eig.py" beforeDir="false" afterPath="$PROJECT_DIR$/1d_eig.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/__init__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/consts.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/consts.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/p1d.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/p1d.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/p2d.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/archive/p2d.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/p3d.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/archive/p3d.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/p1d.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/p1d_more.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/p1d_more.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/series.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/series.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/wf_splitting.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -80,7 +76,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../ec-firmware" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -362,7 +358,12 @@
       <workItem from="1606353273402" duration="32000" />
       <workItem from="1606427139301" duration="46000" />
       <workItem from="1606427813069" duration="3167000" />
-      <workItem from="1606434545071" duration="1116000" />
+      <workItem from="1606434545071" duration="4371000" />
+      <workItem from="1606448966264" duration="599000" />
+      <workItem from="1606495105942" duration="607000" />
+      <workItem from="1606497943851" duration="607000" />
+      <workItem from="1606502009461" duration="676000" />
+      <workItem from="1606518595085" duration="4187000" />
     </task>
     <servers />
   </component>
@@ -382,18 +383,20 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="763" y="484" key="FileChooserDialogImpl" timestamp="1602451787965">
-      <screen x="0" y="0" width="3440" height="1400" />
+    <state x="303" y="327" width="424" height="489" key="FileChooserDialogImpl" timestamp="1606436570492">
+      <screen x="0" y="28" width="1368" height="884" />
     </state>
     <state x="763" y="484" key="FileChooserDialogImpl/0.0.3440.1400@0.0.3440.1400" timestamp="1602451787965" />
+    <state x="303" y="327" width="424" height="489" key="FileChooserDialogImpl/0.28.1368.884@0.28.1368.884" timestamp="1606436570492" />
     <state x="168" y="99" width="1031" height="735" key="SettingsEditor" timestamp="1606428155298">
       <screen x="0" y="28" width="1368" height="884" />
     </state>
     <state x="168" y="99" width="1031" height="735" key="SettingsEditor/0.28.1368.884@0.28.1368.884" timestamp="1606428155298" />
-    <state x="850" y="585" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1602474576491">
-      <screen x="0" y="0" width="3440" height="1400" />
+    <state x="338" y="390" width="444" height="181" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1606497947614">
+      <screen x="0" y="28" width="1368" height="884" />
     </state>
     <state x="850" y="585" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.3440.1400@0.0.3440.1400" timestamp="1602474576491" />
+    <state x="338" y="390" width="444" height="181" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.28.1368.884@0.28.1368.884" timestamp="1606497947614" />
     <state x="1893" y="339" width="672" height="678" key="search.everywhere.popup" timestamp="1605624474395">
       <screen x="0" y="0" width="3440" height="1400" />
     </state>

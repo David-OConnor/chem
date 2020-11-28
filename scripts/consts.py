@@ -2,17 +2,12 @@ import numpy as np
 
 π = np.pi
 
-i = complex(0, 1)
-
 ħ = 1
 m_e = 1
 m_p = 1836
 m_n = 1
 e = 1  # Does it?? elementary charge
 k = 1
-
-#n = 1
-#L = 10
 
 
 # h = 6.2607004e-34  #m^2 * kg /s
