@@ -324,6 +324,12 @@ def calc_energy(n: int) -> float:
 
     return result
 
+def h2_potential(dist: float) -> float:
+    """Given a distance, calculate the potential energy between
+    2 n=1 S orbital hydrogen atoms"""
+    pass
+
+
 
 if __name__ == "__main__":
     n = 1
