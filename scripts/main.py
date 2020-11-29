@@ -100,9 +100,15 @@ class Hydrogen3d:
             plt.show()
 
 
-
 @dataclass
 class Pt:
+    x: float
+    y: float
+    z: float
+
+
+@dataclass
+class Vec:
     x: float
     y: float
     z: float
@@ -384,7 +390,7 @@ def h2_potential(x: float) -> float:
 
     nuc_nuc_V = consts.k * consts.e**2 / x
 
-    dx = 0.1
+    dx = 2
     dv = dx**3
 
     nuc_elec_V = 0
@@ -397,7 +403,7 @@ def h2_potential(x: float) -> float:
     # todo closer together near the nucleus
 
     # `sample_range` applies to all 3 dimensions.
-    sample_range = np.arange(-30, 30, dx)
+    sample_range = np.arange(-10, 10, dx)
 
     sample_pts = []
     for j in range(sample_range.size):
@@ -427,24 +433,27 @@ def h2_potential(x: float) -> float:
 
     elec_elec_V = 0
     e_e_factor = len(sample_pts)**2
+
+    # todo: You have a problem: WFs past the nuclei aren't attracting/repelling
+    # todo in the correct direction!
     for pt0 in sample_pts:
+        pass
+
         r0 = sqrt(pt0.x ** 2 + pt0.y ** 2 + pt0.z ** 2)
         ψ_local0 = H.value(r0, 0, 0)
         for pt1 in sample_pts:
             # todo: We only need to calculate wfs for each pt once!
             # todo: Current approach could slow it down
-            r1 = sqrψ_local0t((pt1.x)**2 + pt1.y**2 + pt1.z**2)
+            r1 = sqrt(pt1.x**2 + pt1.y**2 + pt1.z**2)
             ψ_local1 = H.value(r1, 0, 0)
 
             # These are localized for each pt.
-            dist = sqrt((pt1.x - pt0.x)**2 + (pt1.y - pt1.y)**2 + (pt1.z - pt0.z)**2)
+            dist = sqrt((pt1.x - pt0.x)**2 + (pt1.y - pt0.y)**2 + (pt1.z - pt0.z)**2)
 
             elec_elec_V += consts.k * consts.e * ψ_local0 * ψ_local1 / dist * dv
 
-            elec_val = np.conj(ψ_local) * ψ_local / e_e_factor
-
-
     print(f"NN: {nuc_nuc_V}, NE: {nuc_elec_V}, EE: {elec_elec_V} Net: {nuc_nuc_V + nuc_elec_V + elec_elec_V}")
+
 
 if __name__ == "__main__":
     n = 1
@@ -452,7 +461,7 @@ if __name__ == "__main__":
     # print(calc_energy(n))
 
     h2_potential(1)
-    plot_h_static_3d(n)
+    # plot_h_static_3d(n)
     # plot_h_static(5)
 
     # test_fft()
