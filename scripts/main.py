@@ -113,6 +113,15 @@ class Vec:
     y: float
     z: float
 
+    def __add__(self, other: 'Vec') -> 'Vec':
+        return Vec(self.x + other.x, self.y + other.y, self.z + other.z)
+
+    def __sub__(self, other: 'Vec') -> 'Vec':
+        return Vec(self.x - other.x, self.y - other.y, self.z - other.z)
+
+    def scalar_mul(self, val: float) -> 'Vec':
+        return Vec(val * self.x, val * self.y, val * self.z)
+
 
 matplotlib.use("Qt5Agg")
 # import seaborn as sns
@@ -456,7 +465,7 @@ def h2_potential(x: float) -> float:
             # These are localized for each pt.
             dist = sqrt((pt1.x - pt0.x)**2 + (pt1.y - pt0.y)**2 + (pt1.z - pt0.z)**2)
 
-            elec_elec_V += consts.k * consts.e * ψ_local0 * ψ_local1 / dist * dv
+            elec_elec_V += consts.k * consts.e * ψ_local0 * ψ_local1 * dv
 
     print(f"NN: {nuc_nuc_V}, NE: {nuc_elec_V}, EE: {elec_elec_V} Net: {nuc_nuc_V + nuc_elec_V + elec_elec_V}")
 
@@ -464,22 +473,25 @@ def h2_potential(x: float) -> float:
 
 
 def h2_potential_pov(x: float) -> float:
-    """Calcualte the electric potential between 2 hydrogen atoms"""
+    """Calcualte the electric potential between 2 hydrogen atoms. In this
+    function, we view things from the perspective of the proton of one
+    of the atoms, and calculate everything else relative to it."""
 
     # Start with the perspectic of one atom. Calculate the interaction between
     # its nucleus and the other atom's nucleus, and electron.
 
-    # Our convention will be attraction is positive potential.
+    # Our convention will be that towards our POV nucleus is positive;
+    # repulusion from it is negative.
     n = 1
     E = -2 / (n + 1) ** 2
     H = Hydrogen3d([0, 1])
 
-    nuc_nuc_V = consts.k * consts.e**2 / x
+    # Calculate proton-proton interaction.
+    nuc_nuc_V = Vec(-consts.k * consts.e**2 / x, 0, 0)
 
     dx = 2
     dv = dx**3
 
-    nuc_elec_V = 0
 
     # We'll say the molecules are at the same z and y coordinates,
     # but separated on the x axis by input argument `x`.
@@ -497,39 +509,51 @@ def h2_potential_pov(x: float) -> float:
             for l in range(sample_range.size):
                 sample_pts.append(Pt(j, k_, l))
 
-    # sample_pts = sample_range  # 1d
-
     print("num samples: ", len(sample_pts))
 
+    # Calculate nucleus-electron interaction, with the electron from both atoms.
+    # We integrate over 3d space, using cartesian coordinates.
+    nuc_elec_V = 0
+    # Calculate proton-electron interaction.
     for pt in sample_pts:
         # We need to integrate over volume, eg by splitting up into
         # small cubes.
 
-        # Offset the x value by the distance between nuclei.
-        r = sqrt((pt.x + x)**2 + pt.y**2 + pt.z**2)
+        # Dist of elec from own, and other nuc, for this pt.
+        # The pt is centered on the POV atom. We use these radii
+        # to calculate WF strength.
+        r_own = sqrt(pt.x ** 2 + pt.y ** 2 + pt.z ** 2)
+        ψ_local_own = H.value(r_own, 0, 0)
+        elec_val_own = np.conj(ψ_local_own) * ψ_local_own
 
-        ψ_local = H.value(r, 0, 0)
+        r_other = sqrt((pt.x + x) ** 2 + pt.y ** 2 + pt.z ** 2)
+        ψ_local_other = H.value(r_other, 0, 0)
+        elec_val_other = np.conj(ψ_local_other) * ψ_local_other
 
         # Divide by the number of sample points: The total answer
         # ψ^2 adds up to 1, so this weights each segment evenly.
-        elec_val = np.conj(ψ_local) * ψ_local
+        V_own = consts.k * consts.e * elec_val_own * dv
+        V_other = consts.k * consts.e * elec_val_other * dv
 
-        # 2 for both interactions
-        nuc_elec_V -= 2 * consts.k * consts.e * elec_val / pt.x * dv
+        f_own = Vec().scalar_mul(consts.e)
+
+        v_own = Vec(pt.x, pt.y, pt.z)
+        v_other = Vec(pt.x )
 
     elec_elec_V = 0
 
-    print(f"NN: {nuc_nuc_V}, NE: {nuc_elec_V}, EE: {elec_elec_V} Net: {nuc_nuc_V + nuc_elec_V + elec_elec_V}")
+    print(f"NN: {nuc_nuc_V}, NE: {nuc_elec_V}, Net: {nuc_nuc_V + nuc_elec_V + elec_elec_V}")
 
     # todo: Do a diff calculation, from the perspective of the proton, calculating energy,
     # potential etc from both elecs adn the other proton.
+
 
 if __name__ == "__main__":
     n = 1
 
     # print(calc_energy(n))
 
-    h2_potential(1)
+    h2_potential_pov(1)
     # plot_h_static_3d(n)
     # plot_h_static(5)
 
