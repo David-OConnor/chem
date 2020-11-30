@@ -58,7 +58,7 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="JupyterTrust" id="3378e1df-3d2e-47a4-ae59-58f98d734d04" />
+  <component name="JupyterTrust" id="441695bb-c371-4915-a751-07afa395c556" />
   <component name="MacroExpansionManager">
     <option name="directoryName" value="ZLwoJsIx" />
   </component>
@@ -71,7 +71,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../editor" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../ec-firmware" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -84,18 +84,18 @@
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/scripts/archive" />
+      <recent name="C:\Users\david\code\chem\scripts" />
+      <recent name="C:\Users\david\code\chem\sfepy" />
+      <recent name="C:\Users\david\code\chem" />
+      <recent name="C:\Users\david\code\chem\fe" />
+    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\david\code\chem\fe" />
       <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/src" />
       <recent name="C:\Users\david\code\chem" />
-    </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\david\code\chem\scripts" />
-      <recent name="C:\Users\david\code\chem\sfepy" />
-      <recent name="C:\Users\david\code\chem" />
-      <recent name="C:\Users\david\code\chem\fe" />
-      <recent name="$PROJECT_DIR$" />
     </key>
   </component>
   <component name="RunManager" selected="Python.1d">
@@ -350,8 +350,26 @@
       <workItem from="1606066026016" duration="672000" />
       <workItem from="1606078381916" duration="1000" />
       <workItem from="1606171436911" duration="21000" />
+<<<<<<< HEAD
       <workItem from="1606353273402" duration="644000" />
       <workItem from="1606361403260" duration="2378000" />
+=======
+      <workItem from="1606353273402" duration="32000" />
+      <workItem from="1606427139301" duration="46000" />
+      <workItem from="1606427813069" duration="3167000" />
+      <workItem from="1606434545071" duration="4371000" />
+      <workItem from="1606448966264" duration="599000" />
+      <workItem from="1606495105942" duration="607000" />
+      <workItem from="1606497943851" duration="607000" />
+      <workItem from="1606502009461" duration="676000" />
+      <workItem from="1606518595085" duration="4187000" />
+      <workItem from="1606578950681" duration="599000" />
+      <workItem from="1606582258511" duration="599000" />
+      <workItem from="1606588705795" duration="353000" />
+      <workItem from="1606589712008" duration="647000" />
+      <workItem from="1606593597558" duration="2909000" />
+      <workItem from="1606607948448" duration="610000" />
+>>>>>>> 352c0627ad1ea6c9762eb85cff6011f71a1bca57
     </task>
     <servers />
   </component>
@@ -371,29 +389,24 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="763" y="484" key="FileChooserDialogImpl" timestamp="1602451787965">
-      <screen x="0" y="0" width="3440" height="1400" />
+    <state x="303" y="327" width="424" height="489" key="FileChooserDialogImpl" timestamp="1606436570492">
+      <screen x="0" y="28" width="1368" height="884" />
     </state>
     <state x="763" y="484" key="FileChooserDialogImpl/0.0.3440.1400@0.0.3440.1400" timestamp="1602451787965" />
-    <state x="850" y="585" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1602474576491">
-      <screen x="0" y="0" width="3440" height="1400" />
+    <state x="303" y="327" width="424" height="489" key="FileChooserDialogImpl/0.28.1368.884@0.28.1368.884" timestamp="1606436570492" />
+    <state x="168" y="99" width="1031" height="735" key="SettingsEditor" timestamp="1606428155298">
+      <screen x="0" y="28" width="1368" height="884" />
+    </state>
+    <state x="168" y="99" width="1031" height="735" key="SettingsEditor/0.28.1368.884@0.28.1368.884" timestamp="1606428155298" />
+    <state x="338" y="390" width="444" height="181" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1606497947614">
+      <screen x="0" y="28" width="1368" height="884" />
     </state>
     <state x="850" y="585" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.3440.1400@0.0.3440.1400" timestamp="1602474576491" />
+    <state x="338" y="390" width="444" height="181" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.28.1368.884@0.28.1368.884" timestamp="1606497947614" />
     <state x="1893" y="339" width="672" height="678" key="search.everywhere.popup" timestamp="1605624474395">
       <screen x="0" y="0" width="3440" height="1400" />
     </state>
     <state x="1893" y="339" width="672" height="678" key="search.everywhere.popup/0.0.3440.1400@0.0.3440.1400" timestamp="1605624474395" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/scripts/p1d.py</url>
-          <line>1</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/chem$1d.coverage" NAME="1d Coverage Results" MODIFIED="1559427278925" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
