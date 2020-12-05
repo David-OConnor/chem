@@ -122,6 +122,9 @@ class Vec:
     def scalar_mul(self, val: float) -> 'Vec':
         return Vec(val * self.x, val * self.y, val * self.z)
 
+    def length(self) -> float:
+        return sqrt(self.x**2 + self.y**2 + self.z**2)
+
 
 matplotlib.use("Qt5Agg")
 # import seaborn as sns
@@ -483,15 +486,14 @@ def h2_potential_pov(x: float) -> float:
     # Our convention will be that towards our POV nucleus is positive;
     # repulusion from it is negative.
     n = 1
-    E = -2 / (n + 1) ** 2
     H = Hydrogen3d([0, 1])
 
     # Calculate proton-proton interaction.
-    nuc_nuc_V = Vec(-consts.k * consts.e**2 / x, 0, 0)
+    nuc_nuc_V = consts.k * consts.e / x
+    nuc_nuc_F = Vec(nuc_nuc_V * consts.e / x, 0., 0.)
 
-    dx = 2
+    dx = 1.
     dv = dx**3
-
 
     # We'll say the molecules are at the same z and y coordinates,
     # but separated on the x axis by input argument `x`.
@@ -507,7 +509,7 @@ def h2_potential_pov(x: float) -> float:
     for j in range(sample_range.size):
         for k_ in range(sample_range.size):
             for l in range(sample_range.size):
-                sample_pts.append(Pt(j, k_, l))
+                sample_pts.append(Vec(j, k_, l))
 
     print("num samples: ", len(sample_pts))
 
@@ -515,37 +517,34 @@ def h2_potential_pov(x: float) -> float:
     # We integrate over 3d space, using cartesian coordinates.
     nuc_elec_V = 0
     # Calculate proton-electron interaction.
+    nuc_elec_F = Vec(0., 0., 0.)
     for pt in sample_pts:
-        # We need to integrate over volume, eg by splitting up into
-        # small cubes.
+        # We integrate over volume, eg by splitting up into small cubes
+        # of len dx, and volume dv.
 
         # Dist of elec from own, and other nuc, for this pt.
         # The pt is centered on the POV atom. We use these radii
         # to calculate WF strength.
-        r_own = sqrt(pt.x ** 2 + pt.y ** 2 + pt.z ** 2)
+        r_own = pt.length()
         ψ_local_own = H.value(r_own, 0, 0)
-        elec_val_own = np.conj(ψ_local_own) * ψ_local_own
 
         r_other = sqrt((pt.x + x) ** 2 + pt.y ** 2 + pt.z ** 2)
         ψ_local_other = H.value(r_other, 0, 0)
-        elec_val_other = np.conj(ψ_local_other) * ψ_local_other
 
         # Divide by the number of sample points: The total answer
         # ψ^2 adds up to 1, so this weights each segment evenly.
-        V_own = consts.k * consts.e * elec_val_own * dv
-        V_other = consts.k * consts.e * elec_val_other * dv
+        # (r_own for both, since we're calcing the pt rel to the POV nuc))
+        V_own = consts.k * consts.e * np.conj(ψ_local_own) * ψ_local_own / r_own * dv
+        V_other = consts.k * consts.e * np.conj(ψ_local_other) * ψ_local_other / r_own * dv
 
-        f_own = Vec().scalar_mul(consts.e)
+        # Net elec potential.
+        V_combined = V_own + V_other
 
-        v_own = Vec(pt.x, pt.y, pt.z)
-        v_other = Vec(pt.x )
+        unit_v = pt.scalar_mul(1. / pt.length())
+        nuc_elec_F += unit_v.scalar_mul(V_combined * -consts.e / r_own)
 
-    elec_elec_V = 0
-
-    print(f"NN: {nuc_nuc_V}, NE: {nuc_elec_V}, Net: {nuc_nuc_V + nuc_elec_V + elec_elec_V}")
-
-    # todo: Do a diff calculation, from the perspective of the proton, calculating energy,
-    # potential etc from both elecs adn the other proton.
+    print(f"NN V: {nuc_nuc_V}, NE: V {nuc_elec_V}, Net V: {nuc_nuc_V + nuc_elec_V}")
+    print(f"NN F: {nuc_nuc_F}, NE F: {nuc_elec_F}, Net F: {nuc_nuc_F + nuc_elec_F}")
 
 
 if __name__ == "__main__":
