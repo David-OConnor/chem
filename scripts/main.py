@@ -553,6 +553,7 @@ def h2_force_pov(x: float) -> float:
         V_combined = V_own + V_other
 
         unit_v = pt.scalar_mul(1. / pt.length())
+        print(unit_v)
 
         nuc_elec_F += unit_v.scalar_mul(V_combined * -consts.e / r_own)
 
