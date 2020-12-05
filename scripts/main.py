@@ -458,6 +458,8 @@ def h2_potential(x: float) -> float:
         pass
 
         r0 = sqrt(pt0.x ** 2 + pt0.y ** 2 + pt0.z ** 2)
+        # We're dealing with S orbitals for now; no need to pass anything beyond
+        # radius to the `value` method.
         ψ_local0 = H.value(r0, 0, 0)
         for pt1 in sample_pts:
             # todo: We only need to calculate wfs for each pt once!
@@ -475,7 +477,7 @@ def h2_potential(x: float) -> float:
     # potential etc from both elecs adn the other proton.
 
 
-def h2_potential_pov(x: float) -> float:
+def h2_force_pov(x: float) -> float:
     """Calcualte the electric potential between 2 hydrogen atoms. In this
     function, we view things from the perspective of the proton of one
     of the atoms, and calculate everything else relative to it."""
@@ -485,14 +487,13 @@ def h2_potential_pov(x: float) -> float:
 
     # Our convention will be that towards our POV nucleus is positive;
     # repulusion from it is negative.
-    n = 1
     H = Hydrogen3d([0, 1])
 
     # Calculate proton-proton interaction.
     nuc_nuc_V = consts.k * consts.e / x
     nuc_nuc_F = Vec(nuc_nuc_V * consts.e / x, 0., 0.)
 
-    dx = 1.
+    dx = 0.4
     dv = dx**3
 
     # We'll say the molecules are at the same z and y coordinates,
@@ -503,21 +504,29 @@ def h2_potential_pov(x: float) -> float:
     # todo closer together near the nucleus
 
     # `sample_range` applies to all 3 dimensions.
-    sample_range = np.arange(-10, 10, dx)
+    sample_range = np.arange(-15.1, 15.1, dx)  # Don't let 0 be a pt
+
+    # todo: Manually entering the pts we want
+
+    # Becaus we're dealing with a 3rd power, we need to keep the sample pts minimal. The ones
+    # near the center should be more finely spaced. (Or perhaps tune the spacing dynamically
+    # based on changing slopes?)
+    # sample_range = np.array([-20, -15, -10, -9, -8.5, -8, -7.5, -7, -6.5, -6, -5.5, -5, -])
 
     sample_pts = []
-    for j in range(sample_range.size):
-        for k_ in range(sample_range.size):
-            for l in range(sample_range.size):
+    for j in sample_range:
+        for k_ in sample_range:
+            for l in sample_range:
                 sample_pts.append(Vec(j, k_, l))
 
     print("num samples: ", len(sample_pts))
+    print("Sample range: ", sample_range)
 
     # Calculate nucleus-electron interaction, with the electron from both atoms.
     # We integrate over 3d space, using cartesian coordinates.
-    nuc_elec_V = 0
     # Calculate proton-electron interaction.
     nuc_elec_F = Vec(0., 0., 0.)
+
     for pt in sample_pts:
         # We integrate over volume, eg by splitting up into small cubes
         # of len dx, and volume dv.
@@ -526,6 +535,8 @@ def h2_potential_pov(x: float) -> float:
         # The pt is centered on the POV atom. We use these radii
         # to calculate WF strength.
         r_own = pt.length()
+        # We're dealing with (spherically-symmetrical) S orbitals; we only
+        # need to pass radius to the `value` method.
         ψ_local_own = H.value(r_own, 0, 0)
 
         r_other = sqrt((pt.x + x) ** 2 + pt.y ** 2 + pt.z ** 2)
@@ -533,17 +544,18 @@ def h2_potential_pov(x: float) -> float:
 
         # Divide by the number of sample points: The total answer
         # ψ^2 adds up to 1, so this weights each segment evenly.
-        # (r_own for both, since we're calcing the pt rel to the POV nuc))
+        # (r_own for both, since we're calcing the pt rel to the POV nuc)) # todo is this right??
+        # todo: look to r here for the error?
         V_own = consts.k * consts.e * np.conj(ψ_local_own) * ψ_local_own / r_own * dv
-        V_other = consts.k * consts.e * np.conj(ψ_local_other) * ψ_local_other / r_own * dv
+        V_other = consts.k * consts.e * np.conj(ψ_local_other) * ψ_local_other / r_other * dv
 
         # Net elec potential.
         V_combined = V_own + V_other
 
         unit_v = pt.scalar_mul(1. / pt.length())
+
         nuc_elec_F += unit_v.scalar_mul(V_combined * -consts.e / r_own)
 
-    print(f"NN V: {nuc_nuc_V}, NE: V {nuc_elec_V}, Net V: {nuc_nuc_V + nuc_elec_V}")
     print(f"NN F: {nuc_nuc_F}, NE F: {nuc_elec_F}, Net F: {nuc_nuc_F + nuc_elec_F}")
 
 
@@ -552,7 +564,7 @@ if __name__ == "__main__":
 
     # print(calc_energy(n))
 
-    h2_potential_pov(1)
+    h2_force_pov(1000)
     # plot_h_static_3d(n)
     # plot_h_static(5)
 
