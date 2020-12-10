@@ -1,7 +1,5 @@
 from dataclasses import dataclass
 from scipy.integrate import solve_ivp, simps
-from scipy.fft import fft
-from scipy.stats import invgauss#, invgauss_gen
 
 from functools import partial
 from typing import List, Iterable, Callable, Tuple
@@ -493,7 +491,7 @@ def h2_force_pov(x: float) -> float:
     nuc_nuc_V = consts.k * consts.e / x
     nuc_nuc_F = Vec(nuc_nuc_V * consts.e / x, 0., 0.)
 
-    dx = 0.4
+    dx = 0.18
     dv = dx**3
 
     # We'll say the molecules are at the same z and y coordinates,
@@ -504,7 +502,7 @@ def h2_force_pov(x: float) -> float:
     # todo closer together near the nucleus
 
     # `sample_range` applies to all 3 dimensions.
-    sample_range = np.arange(-15.1, 15.1, dx)  # Don't let 0 be a pt
+    sample_range = np.arange(-12.1, 12.1, dx)  # Don't let 0 be a pt
 
     # todo: Manually entering the pts we want
 
@@ -553,7 +551,6 @@ def h2_force_pov(x: float) -> float:
         V_combined = V_own + V_other
 
         unit_v = pt.scalar_mul(1. / pt.length())
-        print(unit_v)
 
         nuc_elec_F += unit_v.scalar_mul(V_combined * -consts.e / r_own)
 
@@ -565,7 +562,8 @@ if __name__ == "__main__":
 
     # print(calc_energy(n))
 
-    h2_force_pov(1000)
+    # Real dist: 74pm = 1.4 bohrs
+    h2_force_pov(1.4)
     # plot_h_static_3d(n)
     # plot_h_static(5)
 
